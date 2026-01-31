@@ -82,13 +82,8 @@ Run each service individually with `mvn spring-boot:run`.
 - **Swagger:** http://localhost:8080/swagger
 - **Postman Collection:** [postman.json](https://github.com/micaellobo/e-commerce-store/raw/master/documentation/postman.json)
 
-# Next Steps and Improvements
-
-As the project is actively being developed, there are several possibilities for future enhancements and progress. Here
-are a few ideas:
-
-- [ ] **Security:** Transitioning from `JWT` to `OAuth` 2.0 with `Keycloak` for more robust authentication and authorization
-  mechanisms.
-- [ ] **CI/CD:** Set up pipelines to automate testing and deployment processes with `Jenkins`. Currently
-  using `GitHub Actions` to build and push microservices Docker images to `Docker Hub`.
-- [ ] **Container Orchestration:** Explore container orchestration platforms like `Kubernetes`.
+```bash
+  docker compose -f docker-compose-dev.yaml up -d --build
+  
+  docker compose -f docker-compose-dev.yaml down -v   
+```
