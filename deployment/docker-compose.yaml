@@ -3,7 +3,8 @@ name: e-commerce-store
 services:
   db-users:
     container_name: db-users
-    image: postgres
+    image: postgres:16
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -16,7 +17,8 @@ services:
 
   db-inventory:
     container_name: db-inventory
-    image: postgres
+    image: postgres:16
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -29,7 +31,8 @@ services:
 
   db-reviews:
     container_name: db-reviews
-    image: postgres
+    image: postgres:16
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -42,7 +45,8 @@ services:
 
   db-orders:
     container_name: db-orders
-    image: postgres
+    image: postgres:16
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
