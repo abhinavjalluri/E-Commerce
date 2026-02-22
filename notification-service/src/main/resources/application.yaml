@@ -8,7 +8,7 @@ spring:
   application:
     name: notification-service
   profiles:
-    active: dev
+    active: docker
   kafka:
     consumer:
       group-id: order-group

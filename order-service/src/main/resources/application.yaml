@@ -9,8 +9,9 @@ spring:
   application:
     name: order-service
   profiles:
-    active: dev
+    active: docker
   kafka:
+    bootstrap-servers: broker:29092  # Add this line
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer

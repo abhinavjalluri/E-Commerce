@@ -8,7 +8,7 @@ spring:
   application:
     name: reviews-service
   profiles:
-    active: dev
+    active: docker
 springdoc:
   api-docs:
     path: /api-docs

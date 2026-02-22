@@ -1,9 +1,32 @@
+#info:
+#  app:
+#    name: '@project.artifactId@'
+#    version: '@project.version@'
+#server:
+#  port: 8761
+#spring:
+#  profiles:
+#    active: docker
+
 info:
   app:
-    name: '@project.artifactId@'
-    version: '@project.version@'
+    name: ${spring.application.name}
+    version: ${project.version}
+
 server:
   port: 8761
+
 spring:
+  application:
+    name: eureka-service
   profiles:
-    active: dev
+    active: docker
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  instance:
+    hostname: eureka-service
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 5
