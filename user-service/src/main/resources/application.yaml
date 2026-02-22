@@ -4,7 +4,7 @@ spring:
   application:
     name: user-service
   profiles:
-    active: dev
+    active: docker
 springdoc:
   api-docs:
     path: /api-docs

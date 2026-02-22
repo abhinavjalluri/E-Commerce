@@ -2,8 +2,8 @@ version: '3.8'
 name: e-commerce-store-dev
 services:
   db-users:
-    container_name: db-users-dev
-    image: postgres
+    container_name: db-users
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -17,8 +17,8 @@ services:
       - e-commerce-store-dev
 
   db-inventory:
-    container_name: db-inventory-dev
-    image: postgres
+    container_name: db-inventory
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -32,8 +32,8 @@ services:
       - e-commerce-store-dev
 
   db-reviews:
-    container_name: db-reviews-dev
-    image: postgres
+    container_name: db-reviews
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -47,8 +47,8 @@ services:
       - e-commerce-store-dev
 
   db-orders:
-    container_name: db-orders-dev
-    image: postgres
+    container_name: db-orders
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -62,10 +62,12 @@ services:
       - e-commerce-store-dev
 
   eureka-service:
-    container_name: eureka-service-dev
+    container_name: eureka-service
     build:
       context: ../eureka-service
     image: eureka-service
+    ports:
+      - "8761:8761"
     environment:
       SPRING_PROFILES_ACTIVE: 'docker'
     restart: unless-stopped
@@ -73,7 +75,7 @@ services:
       - e-commerce-store-dev
 
   api-gateway:
-    container_name: api-gateway-dev
+    container_name: api-gateway
     build:
       context: ../api-gateway
     image: api-gateway
@@ -88,7 +90,7 @@ services:
       - e-commerce-store-dev
 
   user-service:
-    container_name: user-service-dev
+    container_name: user-service
     build:
       context: ../user-service
     image: user-service
@@ -102,7 +104,7 @@ services:
       - e-commerce-store-dev
 
   auth-service:
-    container_name: auth-service-dev
+    container_name: auth-service
     build:
       context: ../auth-service
     image: auth-service
@@ -116,7 +118,7 @@ services:
       - e-commerce-store-dev
 
   inventory-service:
-    container_name: inventory-service-dev
+    container_name: inventory-service
     build:
       context: ../inventory-service
     image: inventory-service
@@ -130,7 +132,7 @@ services:
       - e-commerce-store-dev
 
   order-service:
-    container_name: order-service-dev
+    container_name: order-service
     build:
       context: ../order-service
     image: order-service
@@ -140,11 +142,14 @@ services:
     depends_on:
       - eureka-service
       - db-users
+      - db-orders  # Changed from db-users
+      - broker     # Add this
+      - init-broker # Add this to ensure topics are created
     networks:
       - e-commerce-store-dev
 
   reviews-service:
-    container_name: reviews-service-dev
+    container_name: reviews-service
     build:
       context: ../reviews-service
     image: reviews-service
@@ -158,7 +163,7 @@ services:
       - e-commerce-store-dev
 
   notification-service:
-    container_name: notification-service-dev
+    container_name: notification-service
     build:
       context: ../notification-service
     image: notification-service
@@ -172,7 +177,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper-dev
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -180,8 +185,8 @@ services:
       - e-commerce-store-dev
 
   broker:
-    image: confluentinc/cp-kafka:latest
-    container_name: broker-dev
+    image: confluentinc/cp-kafka:7.4.0  # Change from 'latest' to specific version
+    container_name: broker
     ports:
       - "9092:9092"
     expose:
@@ -190,9 +195,11 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -200,7 +207,7 @@ services:
       - e-commerce-store-dev
 
   init-broker:
-    container_name: init-broker-dev
+    container_name: init-broker
     image: confluentinc/cp-kafka:latest
     depends_on:
       - broker
@@ -220,7 +227,7 @@ services:
       - e-commerce-store-dev
 
   otel-collector:
-    container_name: otel-collector-dev
+    container_name: otel-collector
     image: otel/opentelemetry-collector-contrib:0.96.0
     restart: unless-stopped
     command:
@@ -241,7 +248,7 @@ services:
       - zipkin
 
   prometheus:
-    container_name: prometheus-dev
+    container_name: prometheus
     image: prom/prometheus
     restart: unless-stopped
     command:
@@ -254,7 +261,7 @@ services:
       - e-commerce-store-dev
 
   grafana:
-    container_name: grafana-dev
+    container_name: grafana
     image: grafana/grafana:latest
     volumes:
       - ./grafana/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
@@ -264,7 +271,7 @@ services:
       - e-commerce-store-dev
 
   loki:
-    container_name: loki-dev
+    container_name: loki
     image: grafana/loki:latest
     command: -config.file=/etc/loki/local-config.yaml
     ports:
@@ -273,7 +280,7 @@ services:
       - e-commerce-store-dev
 
   zipkin:
-    container_name: zipkin-dev
+    container_name: zipkin
     image: openzipkin/zipkin
     restart: unless-stopped
     ports:
@@ -282,7 +289,7 @@ services:
       - e-commerce-store-dev
 
   tempo:
-    container_name: tempo-dev
+    container_name: tempo
     image: grafana/tempo:latest
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
