@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface IProductServiceClient {
-    Optional<ProductDto> getProductById(Long id);
+  Optional<ProductDto> getProductById(Long id);
 
-    Map<Long, ProductDto> getProductById(List<Long> ids);
+  Map<Long, ProductDto> getProductById(List<Long> ids);
 
-    boolean updateStock(List<OrderProductCreateDto> ids);
+  boolean updateStock(List<OrderProductCreateDto> ids);
 }

@@ -13,8 +13,8 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record OrderProductCreateDto(
-        @NotNull Long productId,
-        @Positive int quantity
+  @NotNull Long productId,
+  @Positive int quantity
 )
-        implements Serializable {
+  implements Serializable {
 }

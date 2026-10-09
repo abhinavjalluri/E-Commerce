@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface IProductService {
 
-    ProductDto addOne(ProductCreateDto productCreateDto);
+  ProductDto addOne(ProductCreateDto productCreateDto);
 
-    List<ProductDto> getAll();
+  List<ProductDto> getAll();
 
-    void increaseStock(List<ProductStockQuantityDto> productsQuantities);
+  void increaseStock(List<ProductStockQuantityDto> productsQuantities);
 
-    void decreaseStock(List<ProductStockQuantityDto> productsQuantities);
+  void decreaseStock(List<ProductStockQuantityDto> productsQuantities);
 
-    ProductDto getOneById(Long id);
+  ProductDto getOneById(Long id);
 
-    List<ProductDto> getAllByIds(List<Long> ids);
+  List<ProductDto> getAllByIds(List<Long> ids);
 }

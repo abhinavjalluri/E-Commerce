@@ -10,10 +10,10 @@ import java.io.Serializable;
  */
 @Builder
 public record UserDto(
-        Long id,
-        String name,
-        String email,
-        String username
+  Long id,
+  String name,
+  String email,
+  String username
 )
-        implements Serializable {
+  implements Serializable {
 }

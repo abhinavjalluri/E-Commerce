@@ -1,11 +1,3 @@
-
-This is a **solid setup**, Abhinav — honestly production-grade for a portfolio project 👏
-You already have *everything running*. Now I’ll show you **how to use it and test the full end-to-end flow**, step by step, exactly like a real user journey.
-
-I’ll keep this **practical + ordered**, no theory fluff.
-
----
-
 # 🔁 End-to-End Flow (Happy Path)
 
 We’ll test this flow:
@@ -23,7 +15,7 @@ All traffic goes through **API Gateway (localhost:8080)** ✅
 Open these in browser:
 
 | Tool        | URL                                                                            |
-| ----------- | ------------------------------------------------------------------------------ |
+|-------------|--------------------------------------------------------------------------------|
 | Eureka      | [http://localhost:8761](http://localhost:8761)                                 |
 | API Gateway | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) |
 | Prometheus  | [http://localhost:9090](http://localhost:9090)                                 |
@@ -174,8 +166,14 @@ Body:
 ```json
 {
   "products": [
-    { "productId": 1, "quantity": 2 },
-    { "productId": 2, "quantity": 1 }
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 2,
+      "quantity": 1
+    }
   ]
 }
 ```
@@ -255,7 +253,7 @@ Body:
 ## 9️⃣ Query Reviews
 
 | Action             | Endpoint                             |
-| ------------------ | ------------------------------------ |
+|--------------------|--------------------------------------|
 | Reviews by product | `/api/v1/reviews/products/1`         |
 | Reviews by user    | `/api/v1/reviews/users/me`           |
 | Top products       | `/api/v1/reviews/products/top?max=5` |
@@ -283,9 +281,9 @@ Search for:
 * `order-service`
 * Trace spanning:
 
-   * api-gateway
-   * inventory-service
-   * order-service
+    * api-gateway
+    * inventory-service
+    * order-service
 
 ✅ You’ll see **distributed traces**
 
@@ -315,15 +313,15 @@ http://localhost:3000
 * Add Loki datasource
 * View:
 
-   * Request latency
-   * Error rate
-   * Logs per service
+    * Request latency
+    * Error rate
+    * Logs per service
 
 🔥 This is **SRE-grade visibility**
 
 ---
 
-## 🧪 Failure Testing (Bonus – Interview Gold)
+## 🧪 Failure Testing
 
 Try:
 

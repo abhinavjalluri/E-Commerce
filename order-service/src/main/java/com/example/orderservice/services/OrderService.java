@@ -21,84 +21,83 @@ import java.util.function.Function;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService
-        implements IOrderService {
+  implements IOrderService {
 
-    private final IOrderRepository orderRepository;
-    private final IOrderMapper orderMapper;
-    private final IProductServiceClient productServiceClient;
-    private final IOrderEventProducer orderEventProducer;
-    private final ContextHolder contextHolder;
+  private final IOrderRepository orderRepository;
+  private final IOrderMapper orderMapper;
+  private final IProductServiceClient productServiceClient;
+  private final IOrderEventProducer orderEventProducer;
+  private final ContextHolder contextHolder;
 
+  private static Function<OrderProductCreateDto, OrderProduct> orderProductCreateDtoToOrderProduct(
+    final Map<Long, ProductDto> productById,
+    final Order order
+  ) {
+    return orderProductCreateDto -> {
+      var productDto = Optional.ofNullable(productById.get(orderProductCreateDto.productId()))
+        .orElseThrow(() -> new OrderException(OrderException.PRODUCT_DOES_NOT_EXIST));
 
-    @Transactional
-    @Override
-    public OrderDto addOne(final OrderCreateDto orderCreateDto) {
+      if (orderProductCreateDto.quantity() > productDto.quantity()) {
+        throw new OrderException(OrderException.STOCK_NOT_AVAILABLE);
+      }
 
-        var order = new Order();
+      return OrderProduct.builder()
+        .price(productDto.price())
+        .productId(orderProductCreateDto.productId())
+        .quantity(orderProductCreateDto.quantity())
+        .order(order)
+        .build();
+    };
+  }
 
-        var productsOrder = this.getOrderProducts(orderCreateDto, order);
-        order.setUserId(this.contextHolder.getUserId());
-        order.setProducts(productsOrder);
+  @Transactional
+  @Override
+  public OrderDto addOne(final OrderCreateDto orderCreateDto) {
 
-        var orderSaved = this.orderRepository.save(order);
+    var order = new Order();
 
-        var hasStockUpdated = this.productServiceClient.updateStock(orderCreateDto.products());
+    var productsOrder = this.getOrderProducts(orderCreateDto, order);
+    order.setUserId(this.contextHolder.getUserId());
+    order.setProducts(productsOrder);
 
-        if (!hasStockUpdated) {
-            throw new OrderException(OrderException.ERROR_UPDATE_STOCK);
-        }
+    var orderSaved = this.orderRepository.save(order);
 
-        var dto = this.orderMapper.toDto(orderSaved);
+    var hasStockUpdated = this.productServiceClient.updateStock(orderCreateDto.products());
 
-        this.orderEventProducer.sendOrderCreate(dto);
-
-        return dto;
+    if (!hasStockUpdated) {
+      throw new OrderException(OrderException.ERROR_UPDATE_STOCK);
     }
 
-    @Override
-    public OrderDto getOne(final Long orderId) {
-        var order = this.orderRepository.findById(orderId)
-                                        .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
+    var dto = this.orderMapper.toDto(orderSaved);
 
-        return this.orderMapper.toDto(order);
-    }
+    this.orderEventProducer.sendOrderCreate(dto);
 
-    private List<OrderProduct> getOrderProducts(
-            final OrderCreateDto orderCreateDto,
-            final Order order
-    ) {
+    return dto;
+  }
 
-        var productsId = orderCreateDto.products()
-                                       .stream()
-                                       .map(OrderProductCreateDto::productId)
-                                       .toList();
+  @Override
+  public OrderDto getOne(final Long orderId) {
+    var order = this.orderRepository.findById(orderId)
+      .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
 
-        var productById = this.productServiceClient.getProductById(productsId);
+    return this.orderMapper.toDto(order);
+  }
 
-        return orderCreateDto.products()
-                             .stream()
-                             .map(orderProductCreateDtoToOrderProduct(productById, order))
-                             .toList();
-    }
+  private List<OrderProduct> getOrderProducts(
+    final OrderCreateDto orderCreateDto,
+    final Order order
+  ) {
 
-    private static Function<OrderProductCreateDto, OrderProduct> orderProductCreateDtoToOrderProduct(
-            final Map<Long, ProductDto> productById,
-            final Order order
-    ) {
-        return orderProductCreateDto -> {
-            var productDto = Optional.ofNullable(productById.get(orderProductCreateDto.productId()))
-                                     .orElseThrow(() -> new OrderException(OrderException.PRODUCT_DOES_NOT_EXIST));
+    var productsId = orderCreateDto.products()
+      .stream()
+      .map(OrderProductCreateDto::productId)
+      .toList();
 
-            if (orderProductCreateDto.quantity() > productDto.quantity()) {
-                throw new OrderException(OrderException.STOCK_NOT_AVAILABLE);
-            }
+    var productById = this.productServiceClient.getProductById(productsId);
 
-            return OrderProduct.builder()
-                               .price(productDto.price())
-                               .productId(orderProductCreateDto.productId())
-                               .quantity(orderProductCreateDto.quantity())
-                               .order(order)
-                               .build();
-        };
-    }
+    return orderCreateDto.products()
+      .stream()
+      .map(orderProductCreateDtoToOrderProduct(productById, order))
+      .toList();
+  }
 }

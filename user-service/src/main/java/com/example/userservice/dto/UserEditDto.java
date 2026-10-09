@@ -13,10 +13,10 @@ import java.io.Serializable;
  */
 @Builder
 public record UserEditDto(
-        Long id,
-        @NotNull @NotEmpty @NotBlank
-        String name,
-        @NotNull @Size(min = 10) @NotEmpty @NotBlank String password
+  Long id,
+  @NotNull @NotEmpty @NotBlank
+  String name,
+  @NotNull @Size(min = 10) @NotEmpty @NotBlank String password
 )
-        implements Serializable {
+  implements Serializable {
 }

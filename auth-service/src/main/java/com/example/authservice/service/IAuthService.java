@@ -5,7 +5,7 @@ import com.example.authservice.dtos.LoginDto;
 import com.example.authservice.dtos.UserHeader;
 
 public interface IAuthService {
-    String login(LoginDto loginDto);
+  String login(LoginDto loginDto);
 
-    UserHeader validateToken(String jwt);
+  UserHeader validateToken(String jwt);
 }

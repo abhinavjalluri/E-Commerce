@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record OrderCreateDto(
-        List<OrderProductCreateDto> products
+  List<OrderProductCreateDto> products
 )
-        implements Serializable {
+  implements Serializable {
 }

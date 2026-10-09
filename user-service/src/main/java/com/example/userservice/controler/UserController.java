@@ -30,113 +30,113 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User")
 public class UserController {
 
-    private final IUserService userService;
-    private final ContextHolder contextHolder;
+  private final IUserService userService;
+  private final ContextHolder contextHolder;
 
-    /**
-     * Create a new user
-     *
-     * @param request       The HttpServletRequest.
-     * @param userCreateDto The user to create.
-     * @return The created user.
-     */
-    @Operation(
-            summary = "Create a new user",
-            responses = {
-                    @ApiResponse(responseCode = "201",
-                                 content = {
-                                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                  schema = @Schema(implementation = UserDto.class))
-                                 }),
-                    @ApiResponse(responseCode = "400",
-                                 content = {
-                                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                  schema = @Schema(implementation = ProblemDetail.class))
-                                 })
-            }
-    )
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(
-            HttpServletRequest request,
-            @Valid
-            @RequestBody
-            UserCreateDto userCreateDto
-    ) {
-
-        this.logRequest(request, userCreateDto);
-
-        var userDto = this.userService.addOne(userCreateDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(userDto);
+  /**
+   * Create a new user
+   *
+   * @param request       The HttpServletRequest.
+   * @param userCreateDto The user to create.
+   * @return The created user.
+   */
+  @Operation(
+    summary = "Create a new user",
+    responses = {
+      @ApiResponse(responseCode = "201",
+        content = {
+          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = UserDto.class))
+        }),
+      @ApiResponse(responseCode = "400",
+        content = {
+          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ProblemDetail.class))
+        })
     }
+  )
+  @PostMapping
+  public ResponseEntity<UserDto> createUser(
+    HttpServletRequest request,
+    @Valid
+    @RequestBody
+    UserCreateDto userCreateDto
+  ) {
 
-    /**
-     * Get the user for login
-     *
-     * @param request  The HttpServletRequest.
-     * @param loginDto The user to login.
-     * @return The user.
-     */
-    @Hidden
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> getUserLogin(
-            HttpServletRequest request,
-            @RequestBody
-            LoginDto loginDto
-    ) {
+    this.logRequest(request, userCreateDto);
 
-        this.logRequest(request, null);
+    var userDto = this.userService.addOne(userCreateDto);
 
-        var userDto = this.userService.getUserLogin(loginDto);
+    return ResponseEntity.status(HttpStatus.CREATED)
+      .body(userDto);
+  }
 
-        return ResponseEntity.ok(userDto);
-    }
+  /**
+   * Get the user for login
+   *
+   * @param request  The HttpServletRequest.
+   * @param loginDto The user to login.
+   * @return The user.
+   */
+  @Hidden
+  @PostMapping("/login")
+  public ResponseEntity<UserDto> getUserLogin(
+    HttpServletRequest request,
+    @RequestBody
+    LoginDto loginDto
+  ) {
 
-    /**
-     * Get the current user
-     *
-     * @param request The HttpServletRequest.
-     * @return The user.
-     */
-    @Operation(
-            summary = "Get the current user",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                                 content = {
-                                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                  schema = @Schema(implementation = UserDto.class))
-                                 }),
-                    @ApiResponse(responseCode = "400",
-                                 content = {
-                                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                  schema = @Schema(implementation = ProblemDetail.class))
-                                 })
-            },
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @GetMapping("/me")
-    @RequiresAuthentication
-    public ResponseEntity<UserDto> getUser(HttpServletRequest request) {
+    this.logRequest(request, null);
 
-        this.logRequest(request, null);
+    var userDto = this.userService.getUserLogin(loginDto);
 
-        var userDto = this.userService.getUser();
+    return ResponseEntity.ok(userDto);
+  }
 
-        return ResponseEntity.ok(userDto);
-    }
+  /**
+   * Get the current user
+   *
+   * @param request The HttpServletRequest.
+   * @return The user.
+   */
+  @Operation(
+    summary = "Get the current user",
+    responses = {
+      @ApiResponse(responseCode = "200",
+        content = {
+          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = UserDto.class))
+        }),
+      @ApiResponse(responseCode = "400",
+        content = {
+          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ProblemDetail.class))
+        })
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @GetMapping("/me")
+  @RequiresAuthentication
+  public ResponseEntity<UserDto> getUser(HttpServletRequest request) {
 
-    private void logRequest(
-            final HttpServletRequest request,
-            final Object obj
-    ) {
-        log.info(
-                "{} - {} - {} - {} - {}",
-                request.getMethod(),
-                request.getRequestURI(),
-                this.contextHolder.getCorrelationId(),
-                this.contextHolder.getUsername(),
-                obj
-        );
-    }
+    this.logRequest(request, null);
+
+    var userDto = this.userService.getUser();
+
+    return ResponseEntity.ok(userDto);
+  }
+
+  private void logRequest(
+    final HttpServletRequest request,
+    final Object obj
+  ) {
+    log.info(
+      "{} - {} - {} - {} - {}",
+      request.getMethod(),
+      request.getRequestURI(),
+      this.contextHolder.getCorrelationId(),
+      this.contextHolder.getUsername(),
+      obj
+    );
+  }
 }

@@ -13,38 +13,38 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class CorrelationIdFilter
-        implements GlobalFilter, Ordered {
+  implements GlobalFilter, Ordered {
 
-    public static final String CORRELATION_ID = "correlationId";
+  public static final String CORRELATION_ID = "correlationId";
 
-    @Override
-    public Mono<Void> filter(
-            ServerWebExchange exchange,
-            GatewayFilterChain chain
-    ) {
-        var correlationId = this.generateOrRetrieveCorrelationId();
-        var request = exchange.getRequest()
-                              .mutate()
-                              .header(CORRELATION_ID, correlationId)
-                              .build();
+  @Override
+  public Mono<Void> filter(
+    ServerWebExchange exchange,
+    GatewayFilterChain chain
+  ) {
+    var correlationId = this.generateOrRetrieveCorrelationId();
+    var request = exchange.getRequest()
+      .mutate()
+      .header(CORRELATION_ID, correlationId)
+      .build();
 
-        log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getPath(), correlationId, null, null);
+    log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getPath(), correlationId, null, null);
 
-        var mutatedExchange = exchange
-                .mutate()
-                .request(request)
-                .build();
+    var mutatedExchange = exchange
+      .mutate()
+      .request(request)
+      .build();
 
-        return chain.filter(mutatedExchange);
-    }
+    return chain.filter(mutatedExchange);
+  }
 
-    private String generateOrRetrieveCorrelationId() {
-        return UUID.randomUUID()
-                   .toString();
-    }
+  private String generateOrRetrieveCorrelationId() {
+    return UUID.randomUUID()
+      .toString();
+  }
 
-    @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
-    }
+  @Override
+  public int getOrder() {
+    return Ordered.HIGHEST_PRECEDENCE;
+  }
 }

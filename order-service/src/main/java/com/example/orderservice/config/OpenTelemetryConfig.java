@@ -20,43 +20,43 @@ import org.springframework.core.env.Environment;
 @Configuration
 public class OpenTelemetryConfig {
 
-    @Bean
-    OpenTelemetry openTelemetry(
-            SdkLoggerProvider sdkLoggerProvider,
-            SdkTracerProvider sdkTracerProvider,
-            ContextPropagators contextPropagators
-    ) {
-        var openTelemetrySdk = OpenTelemetrySdk.builder()
-                                               .setLoggerProvider(sdkLoggerProvider)
-                                               .setTracerProvider(sdkTracerProvider)
-                                               .setPropagators(contextPropagators)
-                                               .build();
-        OpenTelemetryAppender.install(openTelemetrySdk);
-        return openTelemetrySdk;
-    }
+  @Bean
+  OpenTelemetry openTelemetry(
+    SdkLoggerProvider sdkLoggerProvider,
+    SdkTracerProvider sdkTracerProvider,
+    ContextPropagators contextPropagators
+  ) {
+    var openTelemetrySdk = OpenTelemetrySdk.builder()
+      .setLoggerProvider(sdkLoggerProvider)
+      .setTracerProvider(sdkTracerProvider)
+      .setPropagators(contextPropagators)
+      .build();
+    OpenTelemetryAppender.install(openTelemetrySdk);
+    return openTelemetrySdk;
+  }
 
-    @Bean
-    SdkLoggerProvider otelSdkLoggerProvider(
-            Environment environment,
-            ObjectProvider<LogRecordProcessor> logRecordProcessors
-    ) {
-        var applicationName = environment.getProperty("spring.application.name", "application");
-        var springResource = Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, applicationName));
-        var builder = SdkLoggerProvider.builder()
-                                       .setResource(Resource.getDefault().merge(springResource));
-        logRecordProcessors.orderedStream().forEach(builder::addLogRecordProcessor);
-        return builder.build();
-    }
+  @Bean
+  SdkLoggerProvider otelSdkLoggerProvider(
+    Environment environment,
+    ObjectProvider<LogRecordProcessor> logRecordProcessors
+  ) {
+    var applicationName = environment.getProperty("spring.application.name", "application");
+    var springResource = Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, applicationName));
+    var builder = SdkLoggerProvider.builder()
+      .setResource(Resource.getDefault().merge(springResource));
+    logRecordProcessors.orderedStream().forEach(builder::addLogRecordProcessor);
+    return builder.build();
+  }
 
 
-    @Bean
-    LogRecordProcessor otelLogRecordProcessor() {
-        return BatchLogRecordProcessor
-                .builder(
-                        OtlpGrpcLogRecordExporter.builder()
-                                                 .setEndpoint("http://otel-collector:4317")
-                                                 .build())
-                .build();
-    }
+  @Bean
+  LogRecordProcessor otelLogRecordProcessor() {
+    return BatchLogRecordProcessor
+      .builder(
+        OtlpGrpcLogRecordExporter.builder()
+          .setEndpoint("http://otel-collector:4317")
+          .build())
+      .build();
+  }
 
 }

@@ -6,23 +6,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SwaggerFilter
-        extends RewritePathGatewayFilterFactory {
-    @Override
-    public GatewayFilter apply(Config config) {
-        return (exchange, chain) -> {
-            var request = exchange.getRequest();
+  extends RewritePathGatewayFilterFactory {
+  @Override
+  public GatewayFilter apply(Config config) {
+    return (exchange, chain) -> {
+      var request = exchange.getRequest();
 
-            var modifiedRequest = request
-                    .mutate()
-                    .path("/api-docs")
-                    .build();
+      var modifiedRequest = request
+        .mutate()
+        .path("/api-docs")
+        .build();
 
-            var build = exchange
-                    .mutate()
-                    .request(modifiedRequest)
-                    .build();
+      var build = exchange
+        .mutate()
+        .request(modifiedRequest)
+        .build();
 
-            return chain.filter(build);
-        };
-    }
+      return chain.filter(build);
+    };
+  }
 }

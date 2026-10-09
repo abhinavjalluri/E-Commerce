@@ -9,7 +9,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class ContextData {
 
-    private final String correlationId;
-    private final Long userId;
-    private final String username;
+  private final String correlationId;
+  private final Long userId;
+  private final String username;
 }

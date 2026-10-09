@@ -6,28 +6,28 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = MappingConstants.ComponentModel.SPRING)
+  componentModel = MappingConstants.ComponentModel.SPRING)
 public interface IProductMapper {
-    Product toProduct(ProductCreateDto productCreateDto);
+  Product toProduct(ProductCreateDto productCreateDto);
 
-    ProductDto toDto(Product product);
+  ProductDto toDto(Product product);
 
-    List<ProductDto> toDto(List<Product> products);
+  List<ProductDto> toDto(List<Product> products);
 
-    void partialUpdate(
-            ProductCreateDto productCreateDto,
-            @MappingTarget
-            Product product
-    );
+  void partialUpdate(
+    ProductCreateDto productCreateDto,
+    @MappingTarget
+    Product product
+  );
 
-    Product toEntity(ProductStockQuantityDto productStockQuantityDto);
+  Product toEntity(ProductStockQuantityDto productStockQuantityDto);
 
-    ProductStockQuantityDto toDto1(Product product);
+  ProductStockQuantityDto toDto1(Product product);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Product partialUpdate(
-            ProductStockQuantityDto productStockQuantityDto,
-            @MappingTarget
-            Product product
-    );
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  Product partialUpdate(
+    ProductStockQuantityDto productStockQuantityDto,
+    @MappingTarget
+    Product product
+  );
 }

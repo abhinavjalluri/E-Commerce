@@ -13,11 +13,11 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record ProductStockQuantityDto(
-        @NotNull
-        Long productId,
-        @NotNull
-        @Positive
-        int quantity
+  @NotNull
+  Long productId,
+  @NotNull
+  @Positive
+  int quantity
 )
-        implements Serializable {
+  implements Serializable {
 }

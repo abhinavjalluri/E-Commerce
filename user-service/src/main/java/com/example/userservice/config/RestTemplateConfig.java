@@ -12,19 +12,19 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class RestTemplateConfig {
 
-    private final ContextHolder contextHolder;
-    private final RestTemplateBuilder restTemplateBuilder;
+  private final ContextHolder contextHolder;
+  private final RestTemplateBuilder restTemplateBuilder;
 
-    @Bean
-    public RestTemplateInterceptor restTemplateInterceptor() {
-        return new RestTemplateInterceptor(this.contextHolder);
-    }
+  @Bean
+  public RestTemplateInterceptor restTemplateInterceptor() {
+    return new RestTemplateInterceptor(this.contextHolder);
+  }
 
-    @Bean
-    @LoadBalanced
-    public RestTemplate getRestTemplate(RestTemplateInterceptor restTemplateInterceptor) {
-        return this.restTemplateBuilder
-                .interceptors(restTemplateInterceptor)
-                .build();
-    }
+  @Bean
+  @LoadBalanced
+  public RestTemplate getRestTemplate(RestTemplateInterceptor restTemplateInterceptor) {
+    return this.restTemplateBuilder
+      .interceptors(restTemplateInterceptor)
+      .build();
+  }
 }

@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record ReviewDto(
-        Long id,
-        Long userId,
-        Long productId,
-        Long orderId,
-        String reviewText,
-        LocalDateTime createdAt,
-        int rating
+  Long id,
+  Long userId,
+  Long productId,
+  Long orderId,
+  String reviewText,
+  LocalDateTime createdAt,
+  int rating
 )
-        implements Serializable {
+  implements Serializable {
 }

@@ -6,11 +6,11 @@ import com.example.userservice.dto.UserDto;
 import com.example.userservice.dto.UserEditDto;
 
 public interface IUserService {
-    UserDto addOne(UserCreateDto userCreateDto);
+  UserDto addOne(UserCreateDto userCreateDto);
 
-    UserDto getUser();
+  UserDto getUser();
 
-    UserDto editUser(UserEditDto userEditDto);
+  UserDto editUser(UserEditDto userEditDto);
 
-    UserDto getUserLogin(LoginDto loginDto);
+  UserDto getUserLogin(LoginDto loginDto);
 }

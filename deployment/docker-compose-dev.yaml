@@ -298,7 +298,7 @@ services:
       - "3200:3200"   # tempo
       - "4317"  # otlp grpc
     networks:
-        - e-commerce-store-dev
+      - e-commerce-store-dev
 
 volumes:
   db-pgdata-users-dev:

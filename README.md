@@ -17,18 +17,21 @@ Spring Boot microservice-based application to manage orders, products, inventory
 
 - Java 17
 - Spring Boot
-- Maven 
+- Maven
 - PostgreSQL
 
 ### Architecture
+
 - Microservices
 - API Gateway Pattern: An `API Gateway` on the edge of the microservices.
 - Service Registration and Discovery: using `Netflix Eureka` for service registration and discovery.
 
 ### Security
+
 - JWT Tokens: Used for authentication and authorization.
 
 ### QA/Testing
+
 - JUnit
 - Mockito
 - Unit Testing
@@ -36,14 +39,17 @@ Spring Boot microservice-based application to manage orders, products, inventory
 - TestContainers
 
 ### CI/CD
+
 - Maven
 - Docker
 - GitHub Actions: Automatically builds, tests and publishes Docker images to Docker Hub.
 
 ### Event-Driven Messaging
+
 - Kafka
 
 ### Observability
+
 - Grafana: Data visualization.
 - OpenTelemetry: Collect metrics, traces, and logs.
 - Grafana Loki: `Logging`.
@@ -80,7 +86,8 @@ Run each service individually with `mvn spring-boot:run`.
 ### Exploring and Interacting with API
 
 - **Swagger:** http://localhost:8080/swagger
-- **Postman Collection:** [postman.json](https://github.com/micaellobo/e-commerce-store/raw/master/documentation/postman.json)
+- **Postman
+  Collection:** [postman.json](https://github.com/micaellobo/e-commerce-store/raw/master/documentation/postman.json)
 
 ```bash
   docker compose -f docker-compose-dev.yaml up -d --build

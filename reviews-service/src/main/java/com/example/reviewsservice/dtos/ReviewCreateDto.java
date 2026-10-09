@@ -15,15 +15,15 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record ReviewCreateDto(
-        @NotNull
-        Long productId,
-        @NotNull
-        Long orderId,
-        @NotBlank
-        String reviewText,
-        @Range(min = 0,
-               max = 5)
-        int rating
+  @NotNull
+  Long productId,
+  @NotNull
+  Long orderId,
+  @NotBlank
+  String reviewText,
+  @Range(min = 0,
+    max = 5)
+  int rating
 )
-        implements Serializable {
+  implements Serializable {
 }
