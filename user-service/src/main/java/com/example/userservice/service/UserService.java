@@ -13,58 +13,58 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService
-        implements IUserService {
+  implements IUserService {
 
-    private final IUserRepository userRepository;
-    private final IUserMapper userMapper;
-    private final ContextHolder contextHolder;
+  private final IUserRepository userRepository;
+  private final IUserMapper userMapper;
+  private final ContextHolder contextHolder;
 
-    @Override
-    public UserDto addOne(final UserCreateDto userCreateDto) {
+  @Override
+  public UserDto addOne(final UserCreateDto userCreateDto) {
 
-        var password = HashUtils.sha256Hash(userCreateDto.password());
+    var password = HashUtils.sha256Hash(userCreateDto.password());
 
-        var user = this.userMapper.toUser(userCreateDto, password);
+    var user = this.userMapper.toUser(userCreateDto, password);
 
-        var exists = this.userRepository.existsUser(user);
+    var exists = this.userRepository.existsUser(user);
 
-        if (exists) {
-            throw new UserException(UserException.USER_ALREADY_EXISTS);
-        }
-
-        var saveSaved = this.userRepository.save(user);
-
-        return this.userMapper.toDto(saveSaved);
+    if (exists) {
+      throw new UserException(UserException.USER_ALREADY_EXISTS);
     }
 
-    @Override
-    public UserDto getUser() {
-        var userSaved = this.userRepository.findByUsername(this.contextHolder.getUsername())
-                                           .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+    var saveSaved = this.userRepository.save(user);
 
-        return this.userMapper.toDto(userSaved);
-    }
+    return this.userMapper.toDto(saveSaved);
+  }
 
-    @Override
-    public UserDto getUserLogin(LoginDto loginDto) {
-        var password = HashUtils.sha256Hash(loginDto.password());
+  @Override
+  public UserDto getUser() {
+    var userSaved = this.userRepository.findByUsername(this.contextHolder.getUsername())
+      .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
 
-        var user = this.userRepository.findByUsernameAndPassword(loginDto.username(), password)
-                                      .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+    return this.userMapper.toDto(userSaved);
+  }
 
-        return this.userMapper.toDto(user);
-    }
+  @Override
+  public UserDto getUserLogin(LoginDto loginDto) {
+    var password = HashUtils.sha256Hash(loginDto.password());
 
-    @Override
-    public UserDto editUser(final UserEditDto userEditDto) {
+    var user = this.userRepository.findByUsernameAndPassword(loginDto.username(), password)
+      .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
 
-        var user = this.userRepository.findById(userEditDto.id())
-                                      .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+    return this.userMapper.toDto(user);
+  }
 
-        this.userMapper.partialUpdate(userEditDto, user);
+  @Override
+  public UserDto editUser(final UserEditDto userEditDto) {
 
-        var userEdited = this.userRepository.save(user);
+    var user = this.userRepository.findById(userEditDto.id())
+      .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
 
-        return this.userMapper.toDto(userEdited);
-    }
+    this.userMapper.partialUpdate(userEditDto, user);
+
+    var userEdited = this.userRepository.save(user);
+
+    return this.userMapper.toDto(userEdited);
+  }
 }

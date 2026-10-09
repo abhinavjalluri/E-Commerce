@@ -3,14 +3,14 @@ package com.example.reviewsservice.controllers;
 import org.springframework.http.HttpStatus;
 
 public class AuthException
-        extends RuntimeException {
+  extends RuntimeException {
 
-    public final HttpStatus httpStatus;
+  public final HttpStatus httpStatus;
 
-    public AuthException(final HttpStatus httpStatus) {
+  public AuthException(final HttpStatus httpStatus) {
 
-        this.httpStatus = httpStatus;
-    }
+    this.httpStatus = httpStatus;
+  }
 
 
 }

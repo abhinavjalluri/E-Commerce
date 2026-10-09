@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 @Builder
 public record LoginDto(
-        String username,
-        @NotNull
-        String password
+  String username,
+  @NotNull
+  String password
 )
-        implements Serializable {
+  implements Serializable {
 }

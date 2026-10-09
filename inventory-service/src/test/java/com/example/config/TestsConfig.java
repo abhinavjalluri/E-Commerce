@@ -15,17 +15,17 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @TestConfiguration(proxyBeanMethods = false)
 public class TestsConfig {
 
-    @Bean
-    @ServiceConnection
-    public PostgreSQLContainer<?> postgreSQLContainer() {
-        return new PostgreSQLContainer<>("postgres:latest");
-    }
+  @Bean
+  @ServiceConnection
+  public PostgreSQLContainer<?> postgreSQLContainer() {
+    return new PostgreSQLContainer<>("postgres:latest");
+  }
 
-    @Bean
-    public RequestSpecification requestSpec(@Value("${local.server.port}") int port) {
-        return new RequestSpecBuilder()
-                .setContentType(ContentType.JSON)
-                .setPort(port)
-                .build();
-    }
+  @Bean
+  public RequestSpecification requestSpec(@Value("${local.server.port}") int port) {
+    return new RequestSpecBuilder()
+      .setContentType(ContentType.JSON)
+      .setPort(port)
+      .build();
+  }
 }

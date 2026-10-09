@@ -14,14 +14,14 @@ import java.math.BigDecimal;
  */
 @Builder
 public record ProductCreateDto(
-        @NotBlank
-        String name,
-        @NotNull
-        @Positive(message = "Only positive number allowed")
-        BigDecimal price,
-        @Positive(message = "Only positive number allowed")
-        int quantity,
-        String description
+  @NotBlank
+  String name,
+  @NotNull
+  @Positive(message = "Only positive number allowed")
+  BigDecimal price,
+  @Positive(message = "Only positive number allowed")
+  int quantity,
+  String description
 )
-        implements Serializable {
+  implements Serializable {
 }

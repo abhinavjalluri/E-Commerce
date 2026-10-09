@@ -10,11 +10,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record OrderDto(
-        Long id,
-        Long userId,
-        List<OrderProductDto> products,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+  Long id,
+  Long userId,
+  List<OrderProductDto> products,
+  LocalDateTime createdAt,
+  LocalDateTime updatedAt
 )
-        implements Serializable {
+  implements Serializable {
 }

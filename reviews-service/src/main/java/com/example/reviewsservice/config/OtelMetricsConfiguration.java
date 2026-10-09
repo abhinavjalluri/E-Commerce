@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OtelMetricsConfiguration {
 
-    @Value("${spring.application.name}")
-    private String applicationName;
+  @Value("${spring.application.name}")
+  private String applicationName;
 
-    @Bean
-    public MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
-        return registry -> registry.config()
-                                   .commonTags("application", this.applicationName);
-    }
+  @Bean
+  public MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
+    return registry -> registry.config()
+      .commonTags("application", this.applicationName);
+  }
 }

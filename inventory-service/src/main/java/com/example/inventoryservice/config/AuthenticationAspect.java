@@ -15,22 +15,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthenticationAspect {
 
-    private final ContextHolder contextHolder;
-    private final HttpServletRequest request;
+  private final ContextHolder contextHolder;
+  private final HttpServletRequest request;
 
-    @Before("@annotation(RequiresAuthentication)")
-    public void beforeRequiresAuthentication() {
-        if (!this.contextHolder.isAuthenticated()) {
-            log.error(
-                    "{} - {} - {} - {} - {}",
-                    this.request.getMethod(),
-                    this.request.getRequestURI(),
-                    this.contextHolder.getCorrelationId(),
-                    this.contextHolder.getUsername(),
-                    null
-            );
-            throw new AuthException(HttpStatus.UNAUTHORIZED);
-        }
+  @Before("@annotation(RequiresAuthentication)")
+  public void beforeRequiresAuthentication() {
+    if (!this.contextHolder.isAuthenticated()) {
+      log.error(
+        "{} - {} - {} - {} - {}",
+        this.request.getMethod(),
+        this.request.getRequestURI(),
+        this.contextHolder.getCorrelationId(),
+        this.contextHolder.getUsername(),
+        null
+      );
+      throw new AuthException(HttpStatus.UNAUTHORIZED);
     }
+  }
 }
 

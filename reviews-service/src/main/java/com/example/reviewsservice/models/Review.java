@@ -17,49 +17,49 @@ import java.util.Objects;
 @AllArgsConstructor
 
 public class Review {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
 
-    @NotNull
-    private Long userId;
+  @NotNull
+  private Long userId;
 
-    @NotNull
-    private Long productId;
+  @NotNull
+  private Long productId;
 
-    @NotNull
-    private Long orderId;
+  @NotNull
+  private Long orderId;
 
-    @NotNull
-    private int rating;
+  @NotNull
+  private int rating;
 
-    @NotNull
-    private String reviewText;
+  @NotNull
+  private String reviewText;
 
-    @CreationTimestamp
-    @Column(nullable = false,
-            updatable = false)
-    private LocalDateTime createdAt;
+  @CreationTimestamp
+  @Column(nullable = false,
+    updatable = false)
+  private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+  @UpdateTimestamp
+  @Column(nullable = false)
+  private LocalDateTime updatedAt;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
-        var user = (Review) o;
-        return this.id.equals(user.id);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-
+    if (o == null || this.getClass() != o.getClass()) {
+      return false;
     }
+    var user = (Review) o;
+    return this.id.equals(user.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id);
+
+  }
 }

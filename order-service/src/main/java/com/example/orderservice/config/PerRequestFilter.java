@@ -18,38 +18,38 @@ import static com.example.orderservice.config.ContextHolder.CORRELATION_ID;
 @Slf4j
 @RequiredArgsConstructor
 public class PerRequestFilter
-        extends OncePerRequestFilter {
+  extends OncePerRequestFilter {
 
-    private final ContextHolder contextHolder;
+  private final ContextHolder contextHolder;
 
-    private static Long parseUserId(final HttpServletRequest request) {
-        try {
-            var userIdString = request.getHeader("userId");
-            return Long.parseLong(userIdString);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
+  private static Long parseUserId(final HttpServletRequest request) {
+    try {
+      var userIdString = request.getHeader("userId");
+      return Long.parseLong(userIdString);
+    } catch (NumberFormatException ignored) {
+      return null;
     }
+  }
 
-    @Override
-    protected void doFilterInternal(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
-            final FilterChain filterChain
-    ) throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final FilterChain filterChain
+  ) throws ServletException, IOException {
 
-        var correlationId = request.getHeader(CORRELATION_ID);
-        var userId = parseUserId(request);
-        var username = request.getHeader("username");
+    var correlationId = request.getHeader(CORRELATION_ID);
+    var userId = parseUserId(request);
+    var username = request.getHeader("username");
 
-        var context = new ContextData(correlationId, userId, username);
+    var context = new ContextData(correlationId, userId, username);
 
-        this.contextHolder.set(context);
+    this.contextHolder.set(context);
 
-        try {
-            filterChain.doFilter(request, response);
-        } finally {
-            this.contextHolder.remove();
-        }
+    try {
+      filterChain.doFilter(request, response);
+    } finally {
+      this.contextHolder.remove();
     }
+  }
 }

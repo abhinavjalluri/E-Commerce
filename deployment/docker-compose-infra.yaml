@@ -95,7 +95,7 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - broker
-    entrypoint: ['/bin/sh', '-c']
+    entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
       # blocks until kafka is reachable

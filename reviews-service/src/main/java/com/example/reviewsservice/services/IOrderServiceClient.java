@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface IOrderServiceClient {
 
-    Optional<OrderDto> getOrder(Long orderId);
+  Optional<OrderDto> getOrder(Long orderId);
 }

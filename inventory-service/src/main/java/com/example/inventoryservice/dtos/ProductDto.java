@@ -11,11 +11,11 @@ import java.math.BigDecimal;
  */
 @Builder
 public record ProductDto(
-        Long id,
-        String name,
-        BigDecimal price,
-        int quantity,
-        String description
+  Long id,
+  String name,
+  BigDecimal price,
+  int quantity,
+  String description
 )
-        implements Serializable {
+  implements Serializable {
 }

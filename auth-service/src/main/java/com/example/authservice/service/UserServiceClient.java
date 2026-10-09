@@ -15,30 +15,30 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserServiceClient
-        implements IUserServiceClient {
+  implements IUserServiceClient {
 
-    private final RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-    @Value("${api.user-service}")
-    private String userServiceUrl;
+  @Value("${api.user-service}")
+  private String userServiceUrl;
 
-    @Override
-    public Optional<UserDto> getUserForLogin(final LoginDto loginDto) {
-        try {
+  @Override
+  public Optional<UserDto> getUserForLogin(final LoginDto loginDto) {
+    try {
 
-            var url = this.userServiceUrl + "/login";
+      var url = this.userServiceUrl + "/login";
 
-            var response = this.restTemplate.postForEntity(url, loginDto, UserDto.class);
+      var response = this.restTemplate.postForEntity(url, loginDto, UserDto.class);
 
-            if (response.getStatusCode()
-                        .isError()) {
-                throw new AuthException(AuthException.GENERIC_LOGIN_FAIL);
-            }
+      if (response.getStatusCode()
+        .isError()) {
+        throw new AuthException(AuthException.GENERIC_LOGIN_FAIL);
+      }
 
-            return Optional.ofNullable(response.getBody());
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-
+      return Optional.ofNullable(response.getBody());
+    } catch (Exception e) {
+      return Optional.empty();
     }
+
+  }
 }

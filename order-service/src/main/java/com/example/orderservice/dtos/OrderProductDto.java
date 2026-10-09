@@ -12,9 +12,9 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record OrderProductDto(
-        Long productId,
-        int quantity,
-        BigDecimal price
+  Long productId,
+  int quantity,
+  BigDecimal price
 )
-        implements Serializable {
+  implements Serializable {
 }

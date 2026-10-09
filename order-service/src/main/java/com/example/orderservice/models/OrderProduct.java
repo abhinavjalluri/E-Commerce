@@ -17,39 +17,39 @@ import java.util.Objects;
 @ToString
 public class OrderProduct {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotNull
-    private Long productId;
+  @NotNull
+  private Long productId;
 
-    @NotNull
-    @Positive
-    private int quantity;
+  @NotNull
+  @Positive
+  private int quantity;
 
-    @Positive
-    @NotNull
-    private BigDecimal price;
+  @Positive
+  @NotNull
+  private BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false)
-    private Order order;
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(nullable = false)
+  private Order order;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
-        var user = (OrderProduct) o;
-        return this.id.equals(user.getId());
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
+    if (o == null || this.getClass() != o.getClass()) {
+      return false;
     }
+    var user = (OrderProduct) o;
+    return this.id.equals(user.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id);
+  }
 }

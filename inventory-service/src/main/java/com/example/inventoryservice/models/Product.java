@@ -16,36 +16,36 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Product {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotNull
-    private String name;
+  @NotNull
+  private String name;
 
-    @Column(precision = 20,
-            scale = 2)
-    private BigDecimal price;
+  @Column(precision = 20,
+    scale = 2)
+  private BigDecimal price;
 
-    @NotNull
-    private int quantity;
+  @NotNull
+  private int quantity;
 
-    private String description;
+  private String description;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
-        var user = (Product) o;
-        return this.id.equals(user.id) || this.name.equals(user.name);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id, this.name);
+    if (o == null || this.getClass() != o.getClass()) {
+      return false;
     }
+    var user = (Product) o;
+    return this.id.equals(user.id) || this.name.equals(user.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id, this.name);
+  }
 }

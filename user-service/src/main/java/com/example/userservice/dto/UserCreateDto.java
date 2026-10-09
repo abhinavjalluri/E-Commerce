@@ -10,14 +10,14 @@ import java.io.Serializable;
  */
 @Builder
 public record UserCreateDto(
-        @NotNull @NotEmpty @NotBlank
-        String name,
-        @NotNull @Email
-        String email,
-        @NotNull @Size(min = 4) @NotEmpty @NotBlank
-        String username,
-        @NotNull @Size(min = 10) @NotEmpty @NotBlank
-        String password
+  @NotNull @NotEmpty @NotBlank
+  String name,
+  @NotNull @Email
+  String email,
+  @NotNull @Size(min = 4) @NotEmpty @NotBlank
+  String username,
+  @NotNull @Size(min = 10) @NotEmpty @NotBlank
+  String password
 )
-        implements Serializable {
+  implements Serializable {
 }

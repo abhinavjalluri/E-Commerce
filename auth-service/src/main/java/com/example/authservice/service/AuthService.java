@@ -12,31 +12,31 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService
-        implements IAuthService {
+  implements IAuthService {
 
-    private final JWTHelper jwtHelper;
-    private final IUserServiceClient userServiceClient;
+  private final JWTHelper jwtHelper;
+  private final IUserServiceClient userServiceClient;
 
-    @Override
-    public String login(final LoginDto loginDto) {
+  @Override
+  public String login(final LoginDto loginDto) {
 
-        var user = this.userServiceClient.getUserForLogin(loginDto)
-                                         .orElseThrow(() -> new AuthException(AuthException.GENERIC_LOGIN_FAIL));
+    var user = this.userServiceClient.getUserForLogin(loginDto)
+      .orElseThrow(() -> new AuthException(AuthException.GENERIC_LOGIN_FAIL));
 
-        try {
-            return this.jwtHelper.generateToken(user);
-        } catch (JsonProcessingException e) {
-            throw new AuthException(AuthException.GENERIC_LOGIN_FAIL);
-        }
+    try {
+      return this.jwtHelper.generateToken(user);
+    } catch (JsonProcessingException e) {
+      throw new AuthException(AuthException.GENERIC_LOGIN_FAIL);
     }
+  }
 
 
-    @Override
-    public UserHeader validateToken(final String jwt) {
-        return this.jwtHelper.decodeJWT(jwt)
-                             .orElseThrow(() -> new AuthException(
-                                     HttpStatus.UNAUTHORIZED,
-                                     AuthException.GENERIC_LOGIN_FAIL
-                             ));
-    }
+  @Override
+  public UserHeader validateToken(final String jwt) {
+    return this.jwtHelper.decodeJWT(jwt)
+      .orElseThrow(() -> new AuthException(
+        HttpStatus.UNAUTHORIZED,
+        AuthException.GENERIC_LOGIN_FAIL
+      ));
+  }
 }
