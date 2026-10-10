@@ -1,4 +1,4 @@
-# 🔁 End-to-End Flow (Happy Path)
+# 🔁 End-to-End Flow
 
 We’ll test this flow:
 
@@ -266,7 +266,7 @@ Authorization: Bearer {{token}}
 
 ---
 
-## 🔍 Observability (This Is Where Your Project Shines)
+## 🔍 Observability
 
 ### 🔹 Zipkin / Tempo
 
@@ -321,25 +321,10 @@ http://localhost:3000
 
 ---
 
-## 🧪 Failure Testing
-
-Try:
-
-* Stop inventory DB → place order
-* Reduce stock below requested quantity
-* Use expired JWT
-
-Observe:
-
-* HTTP errors
-* Traces
-* Logs in Loki
-
----
 
 ## ✅ What You’ve Built
 
-> “This is a production-style Spring Boot microservices system with:
+> “This is a Spring Boot microservices system with:
 >
 > * API Gateway
 > * Service discovery
