@@ -87,7 +87,7 @@ Run each service individually with `mvn spring-boot:run`.
 
 - **Swagger:** http://localhost:8080/swagger
 - **Postman
-  Collection:** [postman.json](https://github.com/micaellobo/e-commerce-store/raw/master/documentation/postman.json)
+  Collection:** [postman.json](https://github.com/abhinavjalluri/E-Commerce/blob/main/docs/postman.json)
 
 ```bash
   docker compose -f docker-compose-dev.yaml up -d --build
