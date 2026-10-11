@@ -183,7 +183,6 @@ class ProductServiceTest {
   @Test
   void increaseStock_WhenSomeGivenProductsDoesNotExist_ShouldThrowProductException() {
     //Arrange
-    var initialQuantity = this.product.getQuantity(); // 100
     var quantityToIncrease = 1;
 
     var quantities = List.of(
