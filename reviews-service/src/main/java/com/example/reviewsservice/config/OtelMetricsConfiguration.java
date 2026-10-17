@@ -14,7 +14,6 @@ public class OtelMetricsConfiguration {
 
   @Bean
   public MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
-    return registry -> registry.config()
-      .commonTags("application", this.applicationName);
+    return registry -> registry.config().commonTags("application", applicationName);
   }
 }

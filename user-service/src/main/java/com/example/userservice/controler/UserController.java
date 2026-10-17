@@ -1,7 +1,7 @@
 package com.example.userservice.controler;
 
-import com.example.userservice.config.ContextHolder;
-import com.example.userservice.config.RequiresAuthentication;
+import com.example.userservice.config.context.ContextHolder;
+import com.example.userservice.config.security.RequiresAuthentication;
 import com.example.userservice.dto.LoginDto;
 import com.example.userservice.dto.UserCreateDto;
 import com.example.userservice.dto.UserDto;
@@ -43,32 +43,15 @@ public class UserController {
   @Operation(
     summary = "Create a new user",
     responses = {
-      @ApiResponse(responseCode = "201",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = UserDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = ProblemDetail.class))
-        })
+      @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     }
   )
   @PostMapping
-  public ResponseEntity<UserDto> createUser(
-    HttpServletRequest request,
-    @Valid
-    @RequestBody
-    UserCreateDto userCreateDto
-  ) {
-
-    this.logRequest(request, userCreateDto);
-
-    var userDto = this.userService.addOne(userCreateDto);
-
-    return ResponseEntity.status(HttpStatus.CREATED)
-      .body(userDto);
+  public ResponseEntity<UserDto> createUser(HttpServletRequest request, @Valid @RequestBody UserCreateDto userCreateDto) {
+    logRequest(request, userCreateDto);
+    var userDto = userService.addOne(userCreateDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   /**
@@ -80,16 +63,9 @@ public class UserController {
    */
   @Hidden
   @PostMapping("/login")
-  public ResponseEntity<UserDto> getUserLogin(
-    HttpServletRequest request,
-    @RequestBody
-    LoginDto loginDto
-  ) {
-
-    this.logRequest(request, null);
-
-    var userDto = this.userService.getUserLogin(loginDto);
-
+  public ResponseEntity<UserDto> getUserLogin(HttpServletRequest request, @RequestBody LoginDto loginDto) {
+    logRequest(request, null);
+    var userDto = userService.getUserLogin(loginDto);
     return ResponseEntity.ok(userDto);
   }
 
@@ -102,41 +78,21 @@ public class UserController {
   @Operation(
     summary = "Get the current user",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = UserDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = ProblemDetail.class))
-        })
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @GetMapping("/me")
   @RequiresAuthentication
   public ResponseEntity<UserDto> getUser(HttpServletRequest request) {
-
-    this.logRequest(request, null);
-
-    var userDto = this.userService.getUser();
-
+    logRequest(request, null);
+    var userDto = userService.getUser();
     return ResponseEntity.ok(userDto);
   }
 
-  private void logRequest(
-    final HttpServletRequest request,
-    final Object obj
-  ) {
-    log.info(
-      "{} - {} - {} - {} - {}",
-      request.getMethod(),
-      request.getRequestURI(),
-      this.contextHolder.getCorrelationId(),
-      this.contextHolder.getUsername(),
-      obj
-    );
+  private void logRequest(HttpServletRequest request, Object obj) {
+    log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getRequestURI(), contextHolder.getCorrelationId(), contextHolder.getUsername(), obj);
   }
+  
 }

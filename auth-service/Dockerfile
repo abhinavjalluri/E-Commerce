@@ -7,5 +7,5 @@ FROM eclipse-temurin:17-jre
 VOLUME /tmp
 COPY --from=build /usr/app/target/*.jar auth-service.jar
 ENTRYPOINT ["java","-jar","/auth-service.jar"]
-EXPOSE 8082
+EXPOSE 8086
 

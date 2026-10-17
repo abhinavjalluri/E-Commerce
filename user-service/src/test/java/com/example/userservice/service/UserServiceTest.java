@@ -1,8 +1,9 @@
 package com.example.userservice.service;
 
-import com.example.userservice.config.ContextHolder;
-import com.example.userservice.controler.UserException;
+import com.example.userservice.config.context.ContextHolder;
+import com.example.userservice.exceptions.UserException;
 import com.example.userservice.dto.*;
+import com.example.userservice.mapper.IUserMapper;
 import com.example.userservice.models.User;
 import com.example.userservice.repository.IUserRepository;
 import com.example.userservice.utils.HashUtils;

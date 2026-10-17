@@ -1,9 +1,11 @@
 package com.example.reviewsservice.services;
 
-import com.example.reviewsservice.config.ContextHolder;
-import com.example.reviewsservice.controllers.ReviewException;
+import com.example.reviewsservice.config.context.ContextHolder;
+import com.example.reviewsservice.exceptions.ReviewException;
 import com.example.reviewsservice.dtos.*;
+import com.example.reviewsservice.mapper.IReviewMapper;
 import com.example.reviewsservice.models.Review;
+import com.example.reviewsservice.outbound.http.IOrderServiceClient;
 import com.example.reviewsservice.repository.IReviewRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

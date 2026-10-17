@@ -12,16 +12,12 @@ import java.util.UUID;
 
 @Component
 @Slf4j
-public class CorrelationIdFilter
-  implements GlobalFilter, Ordered {
+public class CorrelationIdFilter implements GlobalFilter, Ordered {
 
   public static final String CORRELATION_ID = "correlationId";
 
   @Override
-  public Mono<Void> filter(
-    ServerWebExchange exchange,
-    GatewayFilterChain chain
-  ) {
+  public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     var correlationId = this.generateOrRetrieveCorrelationId();
     var request = exchange.getRequest()
       .mutate()
@@ -39,8 +35,7 @@ public class CorrelationIdFilter
   }
 
   private String generateOrRetrieveCorrelationId() {
-    return UUID.randomUUID()
-      .toString();
+    return UUID.randomUUID().toString();
   }
 
   @Override

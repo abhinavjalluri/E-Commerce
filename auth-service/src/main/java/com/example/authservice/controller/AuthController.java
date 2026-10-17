@@ -1,6 +1,6 @@
 package com.example.authservice.controller;
 
-import com.example.authservice.config.ContextHolder;
+import com.example.authservice.config.context.ContextHolder;
 import com.example.authservice.dtos.LoginDto;
 import com.example.authservice.service.IAuthService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -39,67 +39,34 @@ public class AuthController {
     }
   )
   @PostMapping("/login")
-  public ResponseEntity<Object> login(
-    HttpServletRequest request,
-    @Valid
-    @RequestBody
-    LoginDto loginDto
-  ) {
-
-    this.logRequest(request, loginDto);
-
-    var jwt = this.authService.login(loginDto);
-
+  public ResponseEntity<Object> login(HttpServletRequest request, @Valid @RequestBody LoginDto loginDto) {
+    logRequest(request, loginDto);
+    var jwt = authService.login(loginDto);
     var responseHeaders = new HttpHeaders();
     responseHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-
-    return ResponseEntity.noContent()
-      .headers(responseHeaders)
-      .build();
+    return ResponseEntity.noContent().headers(responseHeaders).build();
   }
 
   @Hidden
   @PostMapping("/validate")
-  public ResponseEntity<Object> validateToken(
-    HttpServletRequest request,
-    @RequestHeader(HttpHeaders.AUTHORIZATION)
-    String headerAuthorization
-  ) {
-
-    this.logRequest(request, null);
-
+  public ResponseEntity<Object> validateToken(HttpServletRequest request, @RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuthorization) {
+    logRequest(request, null);
     var jwt = headerAuthorization.replace("Bearer ", "");
-
-    var userHeader = this.authService.validateToken(jwt);
-
+    var userHeader = authService.validateToken(jwt);
     var responseHeaders = new HttpHeaders();
-    responseHeaders.set(
-      "userId",
-      userHeader.id()
-        .toString()
-    );
+    responseHeaders.set("userId", userHeader.id().toString());
     responseHeaders.set("username", userHeader.username());
-
-    return ResponseEntity.ok()
-      .headers(responseHeaders)
-      .build();
-
+    return ResponseEntity.ok().headers(responseHeaders).build();
   }
 
-  private void logRequest(
-    final HttpServletRequest request,
-    final Object obj
-
-
-  ) {
+  private void logRequest(HttpServletRequest request, Object obj) {
     log.info(
       "{} - {} - {} - {} - {}",
       request.getMethod(),
       request.getRequestURI(),
-      this.contextHolder.getCorrelationId(),
-      this.contextHolder.getUsername(),
+      contextHolder.getCorrelationId(),
+      contextHolder.getUsername(),
       obj
     );
-
   }
 }

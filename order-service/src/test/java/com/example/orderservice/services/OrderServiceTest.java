@@ -1,10 +1,12 @@
 package com.example.orderservice.services;
 
-import com.example.orderservice.config.ContextHolder;
-import com.example.orderservice.controllers.OrderException;
+import com.example.orderservice.config.context.ContextHolder;
+import com.example.orderservice.exceptions.OrderException;
 import com.example.orderservice.dtos.*;
 import com.example.orderservice.kafka.IOrderEventProducer;
+import com.example.orderservice.mapper.IOrderMapper;
 import com.example.orderservice.models.Order;
+import com.example.orderservice.outbound.http.IProductServiceClient;
 import com.example.orderservice.repository.IOrderRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

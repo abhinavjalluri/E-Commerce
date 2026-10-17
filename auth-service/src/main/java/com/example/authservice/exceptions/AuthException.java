@@ -1,0 +1,23 @@
+package com.example.authservice.exceptions;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+
+public class AuthException
+  extends RuntimeException {
+  public static final String GENERIC_LOGIN_FAIL = "User not found or password is wrong";
+  public HttpStatusCode statusCode;
+
+  public AuthException() {
+  }
+
+  public AuthException(String message) {
+    super(message);
+  }
+
+  public AuthException(HttpStatus statusCode, String message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+
+}

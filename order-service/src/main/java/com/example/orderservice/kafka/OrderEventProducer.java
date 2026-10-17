@@ -1,6 +1,6 @@
 package com.example.orderservice.kafka;
 
-import com.example.orderservice.controllers.OrderException;
+import com.example.orderservice.exceptions.OrderException;
 import com.example.orderservice.dtos.OrderDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OrderEventProducer
-  implements IOrderEventProducer {
+public class OrderEventProducer implements IOrderEventProducer {
 
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
@@ -24,14 +23,12 @@ public class OrderEventProducer
 
   @Override
   public void sendOrderCreate(OrderDto message) {
-    var data = this.serializeData(message);
-
-    var sendResultFuture = this.kafkaTemplate.send(
-      this.topicOrderCreated,
+    var data = serializeData(message);
+    var sendResultFuture = kafkaTemplate.send(
+      topicOrderCreated,
       message.id().toString(),
       data
     );
-
     sendResultFuture.thenAccept(sendResult -> {
       if (sendResult == null) {
         throw new OrderException(OrderException.ERROR_PUBLISH_ORDER_CREATED);
@@ -39,9 +36,9 @@ public class OrderEventProducer
     });
   }
 
-  private String serializeData(final OrderDto message) {
+  private String serializeData(OrderDto message) {
     try {
-      return this.objectMapper.writeValueAsString(message);
+      return objectMapper.writeValueAsString(message);
     } catch (JsonProcessingException e) {
       throw new OrderException(OrderException.ERROR_PUBLISH_ORDER_CREATED);
     }
