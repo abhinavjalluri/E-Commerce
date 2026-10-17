@@ -242,6 +242,15 @@ Body:
 }
 ```
 
+# Check dataBase
+
+```bash
+docker exec -it db-users psql -U postgres -d users
+docker exec -it db-orders psql -U postgres -d orders
+docker exec -it db-inventory psql -U postgres -d inventory
+docker exec -it db-reviews psql -U postgres -d reviews
+```
+
 ✅ Confirms:
 
 * Auth works

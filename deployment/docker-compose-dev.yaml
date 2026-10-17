@@ -174,9 +174,22 @@ services:
     image: notification-service
     environment:
       SPRING_PROFILES_ACTIVE: 'docker'
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_SMTP_AUTH: "true"
+      MAIL_SMTP_STARTTLS: "true"
+    ports:
+      - "8086:8086"
     restart: unless-stopped
     depends_on:
-      - eureka-service
+      eureka-service:
+        condition: service_started
+      broker:
+        condition: service_started
+      init-broker:
+        condition: service_completed_successfully
     networks:
       - e-commerce-store-dev
 
