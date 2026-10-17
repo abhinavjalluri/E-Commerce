@@ -1,4 +1,4 @@
-package com.example.userservice.config;
+package com.example.userservice.config.context;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.userservice.config.ContextHolder.CORRELATION_ID;
+import static com.example.userservice.config.context.ContextHolder.CORRELATION_ID;
 
 @Configuration
 @Slf4j

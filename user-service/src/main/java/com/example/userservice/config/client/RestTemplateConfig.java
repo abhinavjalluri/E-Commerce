@@ -1,6 +1,7 @@
-package com.example.userservice.config;
+package com.example.userservice.config.client;
 
 
+import com.example.userservice.config.context.ContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -17,14 +18,12 @@ public class RestTemplateConfig {
 
   @Bean
   public RestTemplateInterceptor restTemplateInterceptor() {
-    return new RestTemplateInterceptor(this.contextHolder);
+    return new RestTemplateInterceptor(contextHolder);
   }
 
   @Bean
   @LoadBalanced
   public RestTemplate getRestTemplate(RestTemplateInterceptor restTemplateInterceptor) {
-    return this.restTemplateBuilder
-      .interceptors(restTemplateInterceptor)
-      .build();
+    return restTemplateBuilder.interceptors(restTemplateInterceptor).build();
   }
 }

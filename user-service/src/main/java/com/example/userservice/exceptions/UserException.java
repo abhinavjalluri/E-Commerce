@@ -1,9 +1,8 @@
-package com.example.userservice.controler;
+package com.example.userservice.exceptions;
 
 import org.springframework.http.HttpStatusCode;
 
-public class UserException
-  extends RuntimeException {
+public class UserException extends RuntimeException {
 
   public static final String USER_NOT_FOUND = "The user was not found";
   public static final String USER_ALREADY_EXISTS = "The user already exists";
@@ -16,4 +15,5 @@ public class UserException
   public UserException(final HttpStatusCode statusCode) {
     this.statusCode = statusCode;
   }
+
 }

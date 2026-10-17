@@ -1,4 +1,4 @@
-package com.example.userservice.controler;
+package com.example.userservice.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -16,58 +16,41 @@ public class UserControllerErrorHandling {
   @ExceptionHandler(UserException.class)
   public ResponseEntity<ProblemDetail> onUserException(UserException exception) {
     HttpStatusCode status = HttpStatus.BAD_REQUEST;
-
     if (exception.statusCode != null) {
       status = exception.statusCode;
     }
-
     var problemDetail = ProblemDetail.forStatusAndDetail(status, exception.getMessage());
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-      .body(problemDetail);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ProblemDetail> onMethodArgumentNotValidException(
-    HttpServletRequest request,
-    MethodArgumentNotValidException ex
-  ) {
+  public ResponseEntity<ProblemDetail> onMethodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException ex) {
     var fieldError = ex.getBindingResult()
       .getFieldErrors()
       .get(0);
     var message = fieldError.getDefaultMessage();
     var field = fieldError.getField();
-
     var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, field + " " + message);
-
     problemDetail.setTitle("Validation error");
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-      .body(problemDetail);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
   }
 
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<ProblemDetail> onMissingRequestHeaderException(MissingRequestHeaderException ex) {
-
     var httpStatus = HttpStatus.BAD_REQUEST;
     var message = ex.getMessage();
     var headerName = ex.getHeaderName();
-
     if (headerName.equals("username")) {
       httpStatus = HttpStatus.UNAUTHORIZED;
       message = HttpStatus.UNAUTHORIZED.getReasonPhrase();
     }
-
     var problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, message);
-
-    return ResponseEntity.status(httpStatus)
-      .body(problemDetail);
+    return ResponseEntity.status(httpStatus).body(problemDetail);
   }
 
   @ExceptionHandler(AuthException.class)
   public ResponseEntity<ProblemDetail> onAuthException(AuthException ex) {
-    return ResponseEntity.status(ex.httpStatus)
-      .build();
+    return ResponseEntity.status(ex.httpStatus).build();
   }
 
 }

@@ -1,4 +1,4 @@
-package com.example.userservice.config;
+package com.example.userservice.config.context;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,6 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 @RequestScope
 public class ContextData {
-
   private final String correlationId;
   private final Long userId;
   private final String username;
