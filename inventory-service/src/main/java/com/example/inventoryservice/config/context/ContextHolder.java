@@ -1,4 +1,4 @@
-package com.example.inventoryservice.config;
+package com.example.inventoryservice.config.context;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -22,25 +22,20 @@ public class ContextHolder {
   }
 
   public boolean isAuthenticated() {
-    var customContext = this.get();
-
+    var customContext = get();
     var isUsernameEmptyOrNull = StringUtils.isEmpty(customContext.getUsername());
-
     return !isUsernameEmptyOrNull && customContext.getUserId() != null;
   }
 
   public String getCorrelationId() {
-    return this.get()
-      .getCorrelationId();
+    return get().getCorrelationId();
   }
 
   public Long getUserId() {
-    return this.get()
-      .getUserId();
+    return get().getUserId();
   }
 
   public String getUsername() {
-    return this.get()
-      .getUsername();
+    return get().getUsername();
   }
 }

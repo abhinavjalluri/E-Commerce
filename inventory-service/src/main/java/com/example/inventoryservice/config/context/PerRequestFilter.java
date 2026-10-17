@@ -1,4 +1,4 @@
-package com.example.inventoryservice.config;
+package com.example.inventoryservice.config.context;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,17 +11,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.inventoryservice.config.ContextHolder.CORRELATION_ID;
+import static com.example.inventoryservice.config.context.ContextHolder.CORRELATION_ID;
 
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class PerRequestFilter
-  extends OncePerRequestFilter {
+public class PerRequestFilter extends OncePerRequestFilter {
 
   private final ContextHolder contextHolder;
 
-  private static Long parseUserId(final HttpServletRequest request) {
+  private static Long parseUserId(HttpServletRequest request) {
     try {
       var userIdString = request.getHeader("userId");
       return Long.parseLong(userIdString);
@@ -31,11 +30,7 @@ public class PerRequestFilter
   }
 
   @Override
-  protected void doFilterInternal(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final FilterChain filterChain
-  ) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
     var correlationId = request.getHeader(CORRELATION_ID);
     var userId = parseUserId(request);
@@ -43,12 +38,12 @@ public class PerRequestFilter
 
     var context = new ContextData(correlationId, userId, username);
 
-    this.contextHolder.set(context);
+    contextHolder.set(context);
 
     try {
       filterChain.doFilter(request, response);
     } finally {
-      this.contextHolder.remove();
+      contextHolder.remove();
     }
   }
 }

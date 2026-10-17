@@ -19,4 +19,5 @@ public interface IProductService {
   ProductDto getOneById(Long id);
 
   List<ProductDto> getAllByIds(List<Long> ids);
+
 }

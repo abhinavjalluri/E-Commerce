@@ -1,6 +1,7 @@
-package com.example.inventoryservice.config;
+package com.example.inventoryservice.config.security;
 
-import com.example.inventoryservice.controllers.AuthException;
+import com.example.inventoryservice.config.context.ContextHolder;
+import com.example.inventoryservice.exceptions.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,13 @@ public class AuthenticationAspect {
 
   @Before("@annotation(RequiresAuthentication)")
   public void beforeRequiresAuthentication() {
-    if (!this.contextHolder.isAuthenticated()) {
+    if (!contextHolder.isAuthenticated()) {
       log.error(
         "{} - {} - {} - {} - {}",
-        this.request.getMethod(),
-        this.request.getRequestURI(),
-        this.contextHolder.getCorrelationId(),
-        this.contextHolder.getUsername(),
+        request.getMethod(),
+        request.getRequestURI(),
+        contextHolder.getCorrelationId(),
+        contextHolder.getUsername(),
         null
       );
       throw new AuthException(HttpStatus.UNAUTHORIZED);

@@ -1,7 +1,7 @@
 package com.example.inventoryservice.controllers;
 
 import com.example.config.TestsConfig;
-import com.example.inventoryservice.config.ContextHolder;
+import com.example.inventoryservice.config.context.ContextHolder;
 import com.example.inventoryservice.dtos.ProductCreateDto;
 import com.example.inventoryservice.dtos.ProductStockQuantityDto;
 import io.restassured.specification.RequestSpecification;

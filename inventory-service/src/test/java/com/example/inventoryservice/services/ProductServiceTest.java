@@ -1,7 +1,7 @@
 package com.example.inventoryservice.services;
 
-import com.example.inventoryservice.controllers.ProductException;
-import com.example.inventoryservice.dtos.IProductMapper;
+import com.example.inventoryservice.exceptions.ProductException;
+import com.example.inventoryservice.mapper.IProductMapper;
 import com.example.inventoryservice.dtos.ProductCreateDto;
 import com.example.inventoryservice.dtos.ProductDto;
 import com.example.inventoryservice.dtos.ProductStockQuantityDto;

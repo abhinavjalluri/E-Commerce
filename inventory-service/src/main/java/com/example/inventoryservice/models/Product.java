@@ -23,8 +23,7 @@ public class Product {
   @NotNull
   private String name;
 
-  @Column(precision = 20,
-    scale = 2)
+  @Column(precision = 20, scale = 2)
   private BigDecimal price;
 
   @NotNull
@@ -48,4 +47,5 @@ public class Product {
   public int hashCode() {
     return Objects.hash(this.id, this.name);
   }
+
 }
