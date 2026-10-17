@@ -22,32 +22,26 @@ import static com.example.apigateway.filters.CorrelationIdFilter.CORRELATION_ID;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class AuthenticationPrefilter
-  implements GatewayFilter {
+public class AuthenticationPrefilter implements GatewayFilter {
 
   private final WebClient.Builder webClientBuilder;
 
   @Value("${api.auth-service}")
   private String authServiceUrl;
 
-  private Function<ResponseEntity<Void>, Mono<? extends Void>> getResponseEntityMonoFunction(
-    final ServerWebExchange exchange,
-    final GatewayFilterChain chain
-  ) {
+  private Function<ResponseEntity<Void>, Mono<? extends Void>> getResponseEntityMonoFunction(ServerWebExchange exchange, GatewayFilterChain chain) {
     return response -> {
-      if (!response.getStatusCode()
-        .is2xxSuccessful()) {
-        return this.onError(exchange, response.getStatusCode());
+      if (!response.getStatusCode().is2xxSuccessful()) {
+        return onError(exchange, response.getStatusCode());
       }
 
-      var headers = response
-        .getHeaders();
+      var headers = response.getHeaders();
 
       var userId = headers.getFirst("userId");
       var username = headers.getFirst("username");
 
       if (username == null || userId == null) {
-        return this.onError(exchange, response.getStatusCode());
+        return onError(exchange, response.getStatusCode());
       }
 
       var modifiedRequest = exchange.getRequest()
@@ -56,53 +50,43 @@ public class AuthenticationPrefilter
         .header("username", username)
         .build();
 
-      return chain.filter(exchange.mutate()
-        .request(modifiedRequest)
-        .build());
+      return chain.filter(exchange.mutate().request(modifiedRequest).build());
     };
   }
 
-  private Mono<Void> onError(
-    final ServerWebExchange exchange,
-    final HttpStatusCode statusCode
-  ) {
+  private Mono<Void> onError(ServerWebExchange exchange, HttpStatusCode statusCode) {
     var response = exchange.getResponse();
     response.setStatusCode(statusCode);
     return response.setComplete();
   }
 
   @Override
-  public Mono<Void> filter(
-    final ServerWebExchange exchange,
-    final GatewayFilterChain chain
-  ) {
+  public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-    var headers = exchange.getRequest()
-      .getHeaders();
-
+    var headers = exchange.getRequest().getHeaders();
     var bearerToken = headers.getFirst(HttpHeaders.AUTHORIZATION);
     var correlationID = headers.getFirst(CORRELATION_ID);
 
     if (bearerToken == null) {
       log.error("bearerToken NULL");
-      return this.onError(exchange, HttpStatus.UNAUTHORIZED);
+      return onError(exchange, HttpStatus.UNAUTHORIZED);
     }
     try {
-      return this.webClientBuilder.build()
+      return webClientBuilder.build()
         .post()
-        .uri(this.authServiceUrl + "/validate")
+        .uri(authServiceUrl + "/validate")
         .header(HttpHeaders.AUTHORIZATION, bearerToken)
         .header(CORRELATION_ID, correlationID)
         .retrieve()
         .toBodilessEntity()
-        .flatMap(this.getResponseEntityMonoFunction(exchange, chain))
+        .flatMap(getResponseEntityMonoFunction(exchange, chain))
         .onErrorResume(WebClientResponseException.class, e -> {
           log.error(e.getMessage());
-          return this.onError(exchange, e.getStatusCode());
+          return onError(exchange, e.getStatusCode());
         });
     } catch (Exception e) {
       log.error(e.getMessage());
-      return this.onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR);
+      return onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

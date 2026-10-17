@@ -5,8 +5,7 @@ import org.springframework.cloud.gateway.filter.factory.RewritePathGatewayFilter
 import org.springframework.stereotype.Component;
 
 @Component
-public class SwaggerFilter
-  extends RewritePathGatewayFilterFactory {
+public class SwaggerFilter extends RewritePathGatewayFilterFactory {
   @Override
   public GatewayFilter apply(Config config) {
     return (exchange, chain) -> {

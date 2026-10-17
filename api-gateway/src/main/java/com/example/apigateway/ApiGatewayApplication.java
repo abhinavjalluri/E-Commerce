@@ -23,11 +23,7 @@ public class ApiGatewayApplication {
   }
 
   @Bean
-  public RouteLocator myRoutes(
-    final RouteLocatorBuilder builder,
-    final AuthenticationPrefilter authFilter,
-    final SwaggerFilter swaggerFilter
-  ) {
+  public RouteLocator myRoutes(RouteLocatorBuilder builder, AuthenticationPrefilter authFilter, SwaggerFilter swaggerFilter) {
     return builder.routes()
       .route(
         "auth-service",
