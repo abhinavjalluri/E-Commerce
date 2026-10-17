@@ -1,4 +1,4 @@
-package com.example.orderservice.config;
+package com.example.orderservice.config.context;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,7 @@
 package com.example.orderservice.controllers;
 
-import com.example.orderservice.config.ContextHolder;
-import com.example.orderservice.config.RequiresAuthentication;
+import com.example.orderservice.config.context.ContextHolder;
+import com.example.orderservice.config.security.RequiresAuthentication;
 import com.example.orderservice.dtos.OrderCreateDto;
 import com.example.orderservice.dtos.OrderDto;
 import com.example.orderservice.services.IOrderService;
@@ -37,30 +37,19 @@ public class OrderController {
    * @param orderCreateDto The order to create.
    * @return The created order.
    */
-  @Operation(summary = "Create a new order",
+  @Operation(
+    summary = "Create a new order",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = OrderDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
-    security = @SecurityRequirement(name = "bearerAuth"))
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
   @PostMapping("users/me")
   @RequiresAuthentication
-  public ResponseEntity<OrderDto> add(
-    HttpServletRequest request,
-    @Valid
-    @RequestBody
-    OrderCreateDto orderCreateDto
-  ) {
-    this.logRequest(request, orderCreateDto);
-
-    var orderDto = this.orderService.addOne(orderCreateDto);
-
+  public ResponseEntity<OrderDto> add(HttpServletRequest request, @Valid @RequestBody OrderCreateDto orderCreateDto) {
+    logRequest(request, orderCreateDto);
+    var orderDto = orderService.addOne(orderCreateDto);
     return ResponseEntity.ok(orderDto);
   }
 
@@ -71,56 +60,27 @@ public class OrderController {
    * @param orderId The order id.
    * @return The order.
    */
-  @Operation(summary = "Get an order for the current user",
+  @Operation(
+    summary = "Get an order for the current user",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = OrderDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
-    security = @SecurityRequirement(name = "bearerAuth"))
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
   @GetMapping("users/me/{orderId}")
   @RequiresAuthentication
-  public ResponseEntity<OrderDto> getOne(
-    HttpServletRequest request,
-    @PathVariable
-    Long orderId
-  ) {
-    this.logRequest(request);
-
-    var orderDto = this.orderService.getOne(orderId);
-
+  public ResponseEntity<OrderDto> getOne(HttpServletRequest request, @PathVariable Long orderId) {
+    logRequest(request);
+    var orderDto = orderService.getOne(orderId);
     return ResponseEntity.ok(orderDto);
   }
 
-  private void logRequest(
-    final HttpServletRequest request,
-    final Object obj
-  ) {
-    log.info(
-      "{} - {} - {} - {} - {}",
-      request.getMethod(),
-      request.getRequestURI(),
-      this.contextHolder.getCorrelationId(),
-      this.contextHolder.getUsername(),
-      obj
-    );
+  private void logRequest(HttpServletRequest request, Object obj) {
+    log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getRequestURI(), contextHolder.getCorrelationId(), contextHolder.getUsername(), obj);
   }
 
-  private void logRequest(
-    final HttpServletRequest request
-  ) {
-    log.info(
-      "{} - {} - {} - {} - {}",
-      request.getMethod(),
-      request.getRequestURI(),
-      this.contextHolder.getCorrelationId(),
-      this.contextHolder.getUsername(),
-      null
-    );
+  private void logRequest(HttpServletRequest request) {
+    log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getRequestURI(), contextHolder.getCorrelationId(), contextHolder.getUsername(), null);
   }
 }

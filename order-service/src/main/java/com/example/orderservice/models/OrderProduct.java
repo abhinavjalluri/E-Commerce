@@ -52,4 +52,5 @@ public class OrderProduct {
   public int hashCode() {
     return Objects.hash(this.id);
   }
+
 }

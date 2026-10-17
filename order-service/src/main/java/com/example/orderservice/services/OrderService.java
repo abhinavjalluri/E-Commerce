@@ -1,11 +1,13 @@
 package com.example.orderservice.services;
 
-import com.example.orderservice.config.ContextHolder;
-import com.example.orderservice.controllers.OrderException;
+import com.example.orderservice.config.context.ContextHolder;
+import com.example.orderservice.exceptions.OrderException;
 import com.example.orderservice.dtos.*;
 import com.example.orderservice.kafka.IOrderEventProducer;
+import com.example.orderservice.mapper.IOrderMapper;
 import com.example.orderservice.models.Order;
 import com.example.orderservice.models.OrderProduct;
+import com.example.orderservice.outbound.http.IProductServiceClient;
 import com.example.orderservice.repository.IOrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +22,7 @@ import java.util.function.Function;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class OrderService
-  implements IOrderService {
+public class OrderService implements IOrderService {
 
   private final IOrderRepository orderRepository;
   private final IOrderMapper orderMapper;
@@ -29,10 +30,7 @@ public class OrderService
   private final IOrderEventProducer orderEventProducer;
   private final ContextHolder contextHolder;
 
-  private static Function<OrderProductCreateDto, OrderProduct> orderProductCreateDtoToOrderProduct(
-    final Map<Long, ProductDto> productById,
-    final Order order
-  ) {
+  private static Function<OrderProductCreateDto, OrderProduct> orderProductCreateDtoToOrderProduct(Map<Long, ProductDto> productById, Order order) {
     return orderProductCreateDto -> {
       var productDto = Optional.ofNullable(productById.get(orderProductCreateDto.productId()))
         .orElseThrow(() -> new OrderException(OrderException.PRODUCT_DOES_NOT_EXIST));
@@ -52,49 +50,34 @@ public class OrderService
 
   @Transactional
   @Override
-  public OrderDto addOne(final OrderCreateDto orderCreateDto) {
-
+  public OrderDto addOne(OrderCreateDto orderCreateDto) {
     var order = new Order();
-
-    var productsOrder = this.getOrderProducts(orderCreateDto, order);
-    order.setUserId(this.contextHolder.getUserId());
+    var productsOrder = getOrderProducts(orderCreateDto, order);
+    order.setUserId(contextHolder.getUserId());
     order.setProducts(productsOrder);
-
-    var orderSaved = this.orderRepository.save(order);
-
-    var hasStockUpdated = this.productServiceClient.updateStock(orderCreateDto.products());
-
+    var orderSaved = orderRepository.save(order);
+    var hasStockUpdated = productServiceClient.updateStock(orderCreateDto.products());
     if (!hasStockUpdated) {
       throw new OrderException(OrderException.ERROR_UPDATE_STOCK);
     }
-
-    var dto = this.orderMapper.toDto(orderSaved);
-
-    this.orderEventProducer.sendOrderCreate(dto);
-
+    var dto = orderMapper.toDto(orderSaved);
+    orderEventProducer.sendOrderCreate(dto);
     return dto;
   }
 
   @Override
-  public OrderDto getOne(final Long orderId) {
-    var order = this.orderRepository.findById(orderId)
+  public OrderDto getOne(Long orderId) {
+    var order = orderRepository.findById(orderId)
       .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
-
-    return this.orderMapper.toDto(order);
+    return orderMapper.toDto(order);
   }
 
-  private List<OrderProduct> getOrderProducts(
-    final OrderCreateDto orderCreateDto,
-    final Order order
-  ) {
-
+  private List<OrderProduct> getOrderProducts(OrderCreateDto orderCreateDto, Order order) {
     var productsId = orderCreateDto.products()
       .stream()
       .map(OrderProductCreateDto::productId)
       .toList();
-
-    var productById = this.productServiceClient.getProductById(productsId);
-
+    var productById = productServiceClient.getProductById(productsId);
     return orderCreateDto.products()
       .stream()
       .map(orderProductCreateDtoToOrderProduct(productById, order))

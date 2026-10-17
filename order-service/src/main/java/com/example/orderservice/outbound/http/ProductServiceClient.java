@@ -1,4 +1,4 @@
-package com.example.orderservice.services;
+package com.example.orderservice.outbound.http;
 
 import com.example.orderservice.dtos.OrderProductCreateDto;
 import com.example.orderservice.dtos.ProductDto;
@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProductServiceClient
-  implements IProductServiceClient {
+public class ProductServiceClient implements IProductServiceClient {
 
   private final RestTemplate restTemplate;
 
@@ -25,12 +24,10 @@ public class ProductServiceClient
   private String serviceUrl;
 
   @Override
-  public Optional<ProductDto> getProductById(final Long id) {
+  public Optional<ProductDto> getProductById(Long id) {
     try {
-      var url = this.serviceUrl + "/" + id;
-
-      var response = this.restTemplate.getForEntity(url, ProductDto.class);
-
+      var url = serviceUrl + "/" + id;
+      var response = restTemplate.getForEntity(url, ProductDto.class);
       return Optional.ofNullable(response.getBody());
     } catch (Exception ex) {
       log.error(ex.getMessage());
@@ -39,18 +36,16 @@ public class ProductServiceClient
   }
 
   @Override
-  public Map<Long, ProductDto> getProductById(final List<Long> ids) {
+  public Map<Long, ProductDto> getProductById(List<Long> ids) {
     try {
       var idsStringList = ids.stream()
         .map(String::valueOf)
         .collect(Collectors.joining(","));
 
-      var url = this.serviceUrl + "?ids=" + idsStringList;
+      var url = serviceUrl + "?ids=" + idsStringList;
+      var response = restTemplate.getForEntity(url, ProductDto[].class);
 
-      var response = this.restTemplate.getForEntity(url, ProductDto[].class);
-
-      return Arrays.stream(Objects.requireNonNull(response.getBody()))
-        .collect(Collectors.toMap(ProductDto::id, productDto -> productDto));
+      return Arrays.stream(Objects.requireNonNull(response.getBody())).collect(Collectors.toMap(ProductDto::id, productDto -> productDto));
     } catch (Exception ex) {
       log.error(ex.getMessage());
       return new HashMap<>();
@@ -58,19 +53,16 @@ public class ProductServiceClient
   }
 
   @Override
-  public boolean updateStock(final List<OrderProductCreateDto> ids) {
+  public boolean updateStock(List<OrderProductCreateDto> ids) {
     try {
-      var url = this.serviceUrl + "/decrease-stock";
-
-      var response = this.restTemplate.exchange(
+      var url = serviceUrl + "/decrease-stock";
+      var response = restTemplate.exchange(
         url,
         HttpMethod.PUT,
         new HttpEntity<>(ids),
         Void.class
       );
-
-      return response.getStatusCode()
-        .is2xxSuccessful();
+      return response.getStatusCode().is2xxSuccessful();
     } catch (Exception ex) {
       log.error(ex.getMessage());
       return false;

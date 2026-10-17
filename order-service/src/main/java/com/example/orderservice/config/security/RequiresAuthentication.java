@@ -1,4 +1,4 @@
-package com.example.orderservice.config;
+package com.example.orderservice.config.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,4 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresAuthentication {
-}
+public @interface RequiresAuthentication {}
