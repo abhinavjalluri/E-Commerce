@@ -21,11 +21,7 @@ import org.springframework.core.env.Environment;
 public class OpenTelemetryConfig {
 
   @Bean
-  OpenTelemetry openTelemetry(
-    SdkLoggerProvider sdkLoggerProvider,
-    SdkTracerProvider sdkTracerProvider,
-    ContextPropagators contextPropagators
-  ) {
+  OpenTelemetry openTelemetry(SdkLoggerProvider sdkLoggerProvider, SdkTracerProvider sdkTracerProvider, ContextPropagators contextPropagators) {
     var openTelemetrySdk = OpenTelemetrySdk.builder()
       .setLoggerProvider(sdkLoggerProvider)
       .setTracerProvider(sdkTracerProvider)
@@ -36,14 +32,10 @@ public class OpenTelemetryConfig {
   }
 
   @Bean
-  SdkLoggerProvider otelSdkLoggerProvider(
-    Environment environment,
-    ObjectProvider<LogRecordProcessor> logRecordProcessors
-  ) {
+  SdkLoggerProvider otelSdkLoggerProvider(Environment environment, ObjectProvider<LogRecordProcessor> logRecordProcessors) {
     var applicationName = environment.getProperty("spring.application.name", "application");
     var springResource = Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, applicationName));
-    var builder = SdkLoggerProvider.builder()
-      .setResource(Resource.getDefault().merge(springResource));
+    var builder = SdkLoggerProvider.builder().setResource(Resource.getDefault().merge(springResource));
     logRecordProcessors.orderedStream().forEach(builder::addLogRecordProcessor);
     return builder.build();
   }

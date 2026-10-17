@@ -17,16 +17,13 @@ import java.util.Optional;
 
 @Component
 public class JWTHelper {
-  private static final String SECRET_KEY = "LSE1yJq4TJuIneLtE1ZjwkGITMQJrgiFFZr8vOTGCWc=";
 
-  private static final SecretKey key = new SecretKeySpec(Base64.getDecoder()
-    .decode(SECRET_KEY), "HmacSHA256");
+  private static final String SECRET_KEY = "LSE1yJq4TJuIneLtE1ZjwkGITMQJrgiFFZr8vOTGCWc=";
+  private static final SecretKey key = new SecretKeySpec(Base64.getDecoder().decode(SECRET_KEY), "HmacSHA256");
 
   public String generateToken(UserDto user) throws JsonProcessingException {
 
-    var expirationDate = Date.from(Instant.now()
-      .plus(1, ChronoUnit.DAYS));
-
+    var expirationDate = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
     var issuer = "auth-service";
     var audience = "e-commerce-store";
 

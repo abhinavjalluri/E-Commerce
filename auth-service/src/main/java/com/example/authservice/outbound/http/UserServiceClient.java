@@ -1,6 +1,6 @@
-package com.example.authservice.service;
+package com.example.authservice.outbound.http;
 
-import com.example.authservice.controller.AuthException;
+import com.example.authservice.exceptions.AuthException;
 import com.example.authservice.dtos.LoginDto;
 import com.example.authservice.dtos.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class UserServiceClient
-  implements IUserServiceClient {
+public class UserServiceClient implements IUserServiceClient {
 
   private final RestTemplate restTemplate;
 
@@ -23,18 +22,13 @@ public class UserServiceClient
   private String userServiceUrl;
 
   @Override
-  public Optional<UserDto> getUserForLogin(final LoginDto loginDto) {
+  public Optional<UserDto> getUserForLogin(LoginDto loginDto) {
     try {
-
-      var url = this.userServiceUrl + "/login";
-
-      var response = this.restTemplate.postForEntity(url, loginDto, UserDto.class);
-
-      if (response.getStatusCode()
-        .isError()) {
+      var url = userServiceUrl + "/login";
+      var response = restTemplate.postForEntity(url, loginDto, UserDto.class);
+      if (response.getStatusCode().isError()) {
         throw new AuthException(AuthException.GENERIC_LOGIN_FAIL);
       }
-
       return Optional.ofNullable(response.getBody());
     } catch (Exception e) {
       return Optional.empty();
