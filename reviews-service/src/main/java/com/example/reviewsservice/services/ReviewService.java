@@ -1,9 +1,11 @@
 package com.example.reviewsservice.services;
 
-import com.example.reviewsservice.config.ContextHolder;
-import com.example.reviewsservice.controllers.ReviewException;
+import com.example.reviewsservice.config.context.ContextHolder;
+import com.example.reviewsservice.exceptions.ReviewException;
 import com.example.reviewsservice.dtos.*;
+import com.example.reviewsservice.mapper.IReviewMapper;
 import com.example.reviewsservice.models.Review;
+import com.example.reviewsservice.outbound.http.IOrderServiceClient;
 import com.example.reviewsservice.repository.IReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,18 +18,14 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ReviewService
-  implements IReviewService {
+public class ReviewService implements IReviewService {
 
   private final IReviewMapper reviewMapper;
   private final IReviewRepository reviewRepository;
   private final IOrderServiceClient orderServiceClient;
   private final ContextHolder context;
 
-  private static boolean isProductPresentInOrder(
-    final Long productId,
-    final OrderDto order
-  ) {
+  private static boolean isProductPresentInOrder(Long productId, OrderDto order) {
     return order.products()
       .stream()
       .anyMatch(orderProductDto -> orderProductDto.productId()
@@ -35,52 +33,45 @@ public class ReviewService
   }
 
   @Override
-  public ReviewDto addOne(final ReviewCreateDto reviewCreateDto) {
-    var existsReview = this.reviewRepository.existsByUserIdAndOrderIdAndProductId(
-      this.context.getUserId(),
+  public ReviewDto addOne(ReviewCreateDto reviewCreateDto) {
+    var existsReview = reviewRepository.existsByUserIdAndOrderIdAndProductId(
+      context.getUserId(),
       reviewCreateDto.orderId(),
       reviewCreateDto.productId()
     );
-
     if (existsReview) {
       throw new ReviewException(ReviewException.REVIEW_ALREADY_EXISTS);
     }
-
-    var order = this.orderServiceClient.getOrder(reviewCreateDto.orderId())
+    var order = orderServiceClient.getOrder(reviewCreateDto.orderId())
       .orElseThrow(() -> new ReviewException(ReviewException.ORDER_DOES_NOT_EXIST));
-
     if (!isProductPresentInOrder(reviewCreateDto.productId(), order)) {
       throw new ReviewException(ReviewException.PRODUCT_NOT_PRESENT_IN_ORDER);
     }
-
-    var review = this.reviewMapper.toReview(reviewCreateDto, this.context.getUserId());
-
-    var reviewSaved = this.reviewRepository.save(review);
-
-    return this.reviewMapper.toDto(reviewSaved);
+    var review = reviewMapper.toReview(reviewCreateDto, context.getUserId());
+    var reviewSaved = reviewRepository.save(review);
+    return reviewMapper.toDto(reviewSaved);
   }
 
   @Override
   public List<ReviewDto> getAllByUser() {
-    var repositoryByUser = this.reviewRepository.findByUserId(this.context.getUserId());
-    return this.reviewMapper.toDto(repositoryByUser);
+    var repositoryByUser = reviewRepository.findByUserId(context.getUserId());
+    return reviewMapper.toDto(repositoryByUser);
   }
 
   @Override
-  public List<ReviewDto> getAllByProduct(final Long productId) {
-    var reviewsByProduct = this.reviewRepository.findByProductId(productId);
-
-    return this.reviewMapper.toDto(reviewsByProduct);
+  public List<ReviewDto> getAllByProduct(Long productId) {
+    var reviewsByProduct = reviewRepository.findByProductId(productId);
+    return reviewMapper.toDto(reviewsByProduct);
   }
 
   @Override
-  public boolean deleteOne(final Long reviewId) {
-    return this.reviewRepository.deleteOneById(reviewId) == 1;
+  public boolean deleteOne(Long reviewId) {
+    return reviewRepository.deleteOneById(reviewId) == 1;
   }
 
   @Override
-  public List<ProductAvgRatDto> getTopAvgRatedProducts(final int max) {
-    return this.reviewRepository.findAll()
+  public List<ProductAvgRatDto> getTopAvgRatedProducts(int max) {
+    return reviewRepository.findAll()
       .stream()
       .collect(Collectors.groupingBy(
         Review::getProductId,
@@ -97,4 +88,5 @@ public class ReviewService
         ))
       .toList();
   }
+
 }

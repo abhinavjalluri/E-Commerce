@@ -1,6 +1,6 @@
-package com.example.reviewsservice.services;
+package com.example.reviewsservice.outbound.http;
 
-import com.example.reviewsservice.controllers.ReviewException;
+import com.example.reviewsservice.exceptions.ReviewException;
 import com.example.reviewsservice.dtos.OrderDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +15,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OrderServiceClient
-  implements IOrderServiceClient {
+public class OrderServiceClient implements IOrderServiceClient {
 
   private final RestTemplate restTemplate;
 
@@ -25,30 +24,24 @@ public class OrderServiceClient
 
   @Override
   public Optional<OrderDto> getOrder(Long orderId) {
-    var url = this.serviceUrl + "/users/me/" + orderId;
+    var url = serviceUrl + "/users/me/" + orderId;
     ResponseEntity<OrderDto> response = null;
     try {
-      response = this.restTemplate.getForEntity(url, OrderDto.class);
-
+      response = restTemplate.getForEntity(url, OrderDto.class);
       if (!response.getStatusCode()
         .is2xxSuccessful()) {
-        log.error(response.getStatusCode()
-          .toString());
+        log.error(response.getStatusCode().toString());
       }
-
       return Optional.ofNullable(response.getBody());
     } catch (Exception e) {
       HttpStatusCode statusCode = null;
-
       if (response != null) {
         statusCode = response.getStatusCode();
       }
-
       if (statusCode != null && statusCode.is5xxServerError()) {
         log.error("OrderServiceClient - " + e.getMessage());
         throw new ReviewException(statusCode);
       }
-
       return Optional.empty();
     }
   }

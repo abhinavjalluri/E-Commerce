@@ -9,13 +9,15 @@ import java.util.List;
 
 @Service
 public interface IReviewService {
-  ReviewDto addOne(final ReviewCreateDto reviewCreateDto);
 
-  List<ReviewDto> getAllByProduct(final Long productId);
+  ReviewDto addOne(ReviewCreateDto reviewCreateDto);
+
+  List<ReviewDto> getAllByProduct(Long productId);
 
   List<ReviewDto> getAllByUser();
 
-  boolean deleteOne(final Long reviewId);
+  boolean deleteOne(Long reviewId);
 
   List<ProductAvgRatDto> getTopAvgRatedProducts(int max);
+
 }

@@ -1,6 +1,7 @@
-package com.example.reviewsservice.config;
+package com.example.reviewsservice.config.security;
 
-import com.example.reviewsservice.controllers.AuthException;
+import com.example.reviewsservice.config.context.ContextHolder;
+import com.example.reviewsservice.exceptions.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +21,18 @@ public class AuthenticationAspect {
 
   @Before("@annotation(RequiresAuthentication)")
   public void beforeRequiresAuthentication() {
-    if (!this.contextHolder.isAuthenticated()) {
+    if (!contextHolder.isAuthenticated()) {
       log.error(
         "{} - {} - {} - {} - {}",
-        this.request.getMethod(),
-        this.request.getRequestURI(),
-        this.contextHolder.getCorrelationId(),
-        this.contextHolder.getUsername(),
+        request.getMethod(),
+        request.getRequestURI(),
+        contextHolder.getCorrelationId(),
+        contextHolder.getUsername(),
         null
       );
       throw new AuthException(HttpStatus.UNAUTHORIZED);
     }
   }
+
 }
 

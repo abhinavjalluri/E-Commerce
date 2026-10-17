@@ -1,4 +1,4 @@
-package com.example.reviewsservice.config;
+package com.example.reviewsservice.config.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

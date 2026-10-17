@@ -1,7 +1,7 @@
 package com.example.reviewsservice.controllers;
 
-import com.example.reviewsservice.config.ContextHolder;
-import com.example.reviewsservice.config.RequiresAuthentication;
+import com.example.reviewsservice.config.context.ContextHolder;
+import com.example.reviewsservice.config.security.RequiresAuthentication;
 import com.example.reviewsservice.dtos.ProductAvgRatDto;
 import com.example.reviewsservice.dtos.ReviewCreateDto;
 import com.example.reviewsservice.dtos.ReviewDto;
@@ -45,32 +45,17 @@ public class ReviewController {
   @Operation(
     summary = "Create a new review for the current user",
     responses = {
-      @ApiResponse(responseCode = "201",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = ReviewDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ReviewDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @PostMapping("users/me")
   @RequiresAuthentication
-  public ResponseEntity<ReviewDto> add(
-    final HttpServletRequest request,
-    @Valid
-    @RequestBody
-    ReviewCreateDto reviewCreateDto
-  ) {
-
-    this.logRequest(request, reviewCreateDto);
-
-    var review = this.reviewService.addOne(reviewCreateDto);
-
-    return ResponseEntity.status(HttpStatus.CREATED)
-      .body(review);
+  public ResponseEntity<ReviewDto> add(HttpServletRequest request, @Valid @RequestBody ReviewCreateDto reviewCreateDto) {
+    logRequest(request, reviewCreateDto);
+    var review = reviewService.addOne(reviewCreateDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(review);
   }
 
   /**
@@ -82,25 +67,16 @@ public class ReviewController {
   @Operation(
     summary = "Get all reviews for the current user",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @GetMapping("users/me")
   @RequiresAuthentication
-  public ResponseEntity<List<ReviewDto>> getAllByUser(final HttpServletRequest request) {
-
-    this.logRequest(request, null);
-
-    var reviews = this.reviewService.getAllByUser();
-
+  public ResponseEntity<List<ReviewDto>> getAllByUser(HttpServletRequest request) {
+    logRequest(request, null);
+    var reviews = reviewService.getAllByUser();
     return ResponseEntity.ok(reviews);
   }
 
@@ -114,34 +90,20 @@ public class ReviewController {
   @Operation(
     summary = "Get the review by id for the current user",
     responses = {
-      @ApiResponse(responseCode = "204",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = ReviewDto.class))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "204", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ReviewDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     },
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @DeleteMapping("users/me/{reviewId}")
   @RequiresAuthentication
-  public ResponseEntity<Object> deleteOne(
-    final HttpServletRequest request,
-    @PathVariable final Long reviewId
-  ) {
-
-    this.logRequest(request, null);
-
-    var hasDeleted = this.reviewService.deleteOne(reviewId);
-
+  public ResponseEntity<Object> deleteOne(HttpServletRequest request, @PathVariable Long reviewId) {
+    logRequest(request, null);
+    var hasDeleted = reviewService.deleteOne(reviewId);
     if (hasDeleted) {
-      return ResponseEntity.noContent()
-        .build();
+      return ResponseEntity.noContent().build();
     } else {
-      return ResponseEntity.notFound()
-        .build();
+      return ResponseEntity.notFound().build();
     }
   }
 
@@ -155,27 +117,14 @@ public class ReviewController {
   @Operation(
     summary = "Get all reviews for the product",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     }
   )
   @GetMapping("products/{productId}")
-  public ResponseEntity<List<ReviewDto>> getAllByProduct(
-    final HttpServletRequest request,
-    @PathVariable
-    Long productId
-  ) {
-
-    this.logRequest(request, null);
-
-    var reviews = this.reviewService.getAllByProduct(productId);
-
+  public ResponseEntity<List<ReviewDto>> getAllByProduct(HttpServletRequest request, @PathVariable Long productId) {
+    logRequest(request, null);
+    var reviews = reviewService.getAllByProduct(productId);
     return ResponseEntity.ok(reviews);
   }
 
@@ -189,43 +138,18 @@ public class ReviewController {
   @Operation(
     summary = "Get the top reviews for the product",
     responses = {
-      @ApiResponse(responseCode = "200",
-        content = {
-          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-            array = @ArraySchema(schema = @Schema(implementation = ProductAvgRatDto.class)))
-        }),
-      @ApiResponse(responseCode = "400",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(implementation = ProblemDetail.class)))
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ProductAvgRatDto.class)))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
     }
   )
   @GetMapping("products/top")
-  public ResponseEntity<List<ProductAvgRatDto>> getTopByProduct(
-    final HttpServletRequest request,
-    @RequestParam(required = false,
-      defaultValue = "5")
-    int max
-  ) {
-
-    this.logRequest(request, null);
-
-    var reviews = this.reviewService.getTopAvgRatedProducts(max);
-
+  public ResponseEntity<List<ProductAvgRatDto>> getTopByProduct(HttpServletRequest request, @RequestParam(required = false, defaultValue = "5") int max) {
+    logRequest(request, null);
+    var reviews = reviewService.getTopAvgRatedProducts(max);
     return ResponseEntity.ok(reviews);
   }
 
-
-  private void logRequest(
-    final HttpServletRequest request,
-    final Object obj
-  ) {
-    log.info(
-      "{} - {} - {} - {} - {}",
-      request.getMethod(),
-      request.getRequestURI(),
-      this.contextHolder.getCorrelationId(),
-      this.contextHolder.getUsername(),
-      obj
-    );
+  private void logRequest(HttpServletRequest request, Object obj) {
+    log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getRequestURI(), contextHolder.getCorrelationId(), contextHolder.getUsername(), obj);
   }
 }
