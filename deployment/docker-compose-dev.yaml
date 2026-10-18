@@ -96,10 +96,16 @@ services:
     image: user-service
     environment:
       SPRING_PROFILES_ACTIVE: 'docker'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     restart: unless-stopped
     depends_on:
-      - eureka-service
-      - db-users
+      eureka-service:
+        condition: service_started
+      db-users:
+        condition: service_started
+      redis:
+        condition: service_healthy
     networks:
       - e-commerce-store-dev
 
@@ -174,6 +180,8 @@ services:
     image: notification-service
     environment:
       SPRING_PROFILES_ACTIVE: 'docker'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: 587
       MAIL_USERNAME: ${MAIL_USERNAME}
@@ -190,6 +198,25 @@ services:
         condition: service_started
       init-broker:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - e-commerce-store-dev
+
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    command: [ "redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-lru" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data-dev:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
     networks:
       - e-commerce-store-dev
 
@@ -327,6 +354,7 @@ volumes:
   db-pgdata-inventory-dev:
   db-pgdata-reviews-dev:
   db-pgdata-orders-dev:
+  redis-data-dev:
 
 networks:
   e-commerce-store-dev:
