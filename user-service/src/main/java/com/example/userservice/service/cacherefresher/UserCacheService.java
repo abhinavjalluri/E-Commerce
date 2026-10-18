@@ -3,8 +3,7 @@ package com.example.userservice.service.cacherefresher;
 import com.example.userservice.dto.UserCacheDto;
 import com.example.userservice.models.User;
 import com.example.userservice.repository.IUserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,17 +11,18 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Duration;
 import java.util.*;
 
 @Service
+@Slf4j
 public class UserCacheService {
 
-  private static final Logger log = LoggerFactory.getLogger(UserCacheService.class);
-
   private static final String USER_KEY_PREFIX = "users:";
-  private static final String USER_INDEX_KEY = "users-index"; // set of cached user ids
+  private static final String USER_INDEX_KEY = "users-index";
 
   private final StringRedisTemplate redisTemplate;
   private final IUserRepository userRepository;
@@ -41,21 +41,31 @@ public class UserCacheService {
     this.batchSize = batchSize;
   }
 
-  /** Called manually after insert/update. */
   public void cacheUser(User user) {
     String key = USER_KEY_PREFIX + user.getId();
-    redisTemplate.opsForHash().putAll(key, toHash(user.getId(), user.getName(), user.getEmail()));
+    redisTemplate.opsForHash().putAll(key, Map.of(
+      "userId", user.getId().toString(),
+      "name", user.getName(),
+      "email", user.getEmail()
+    ));
     redisTemplate.expire(key, ttl);
     redisTemplate.opsForSet().add(USER_INDEX_KEY, user.getId().toString());
   }
 
-  /** Called manually after delete. */
   public void evictUser(Long userId) {
     redisTemplate.delete(USER_KEY_PREFIX + userId);
     redisTemplate.opsForSet().remove(USER_INDEX_KEY, userId.toString());
   }
 
-  /** Reads ALL users from DB in pages, writes them to Redis, removes entries for users no longer in DB. */
+  public void cacheUserAfterCommit(User user) {
+    runAfterCommit(() -> cacheUser(user), "cache user " + user.getId());
+  }
+
+  public void evictUserAfterCommit(Long userId) {
+    runAfterCommit(() -> evictUser(userId), "evict user " + userId);
+  }
+
+  /** Reads all users from DB page by page, writes to Redis, removes stale entries. */
   public int refreshAll() {
     Set<String> previous = redisTemplate.opsForSet().members(USER_INDEX_KEY);
     Set<String> current = new HashSet<>();
@@ -103,7 +113,24 @@ public class UserCacheService {
     });
   }
 
-  private Map<String, String> toHash(Long id, String name, String email) {
-    return Map.of("userId", id.toString(), "name", name, "email", email);
+  private void runAfterCommit(Runnable action, String description) {
+    Runnable safe = () -> {
+      try {
+        action.run();
+      } catch (Exception e) {
+        log.warn("Redis operation failed ({}); next refresh will fix it", description, e);
+      }
+    };
+
+    if (TransactionSynchronizationManager.isSynchronizationActive()) {
+      TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+        @Override
+        public void afterCommit() {
+          safe.run();
+        }
+      });
+    } else {
+      safe.run();
+    }
   }
 }
