@@ -243,7 +243,6 @@ docker compose -f docker-compose-dev.yaml ps
 | Tool | URL | Expected |
 |---|---|---|
 | Eureka | http://localhost:8761 | All services `UP` |
-| Gateway health | http://localhost:8080/actuator/health | `{"status":"UP"}` |
 | Prometheus | http://localhost:9090 | UI loads |
 | Grafana | http://localhost:3000 | Login (`admin/admin`) |
 | Zipkin | http://localhost:9411 | UI loads |
