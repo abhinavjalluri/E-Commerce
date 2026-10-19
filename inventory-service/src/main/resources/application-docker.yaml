@@ -21,6 +21,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+product:
+  cache:
+    ttl: 30m
+    page-ttl: 2m
+    refresh-interval-ms: 300000
+    batch-size: 500
+
 management:
   otlp:
     metrics:
