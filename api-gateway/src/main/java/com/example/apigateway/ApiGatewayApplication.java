@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -31,14 +32,30 @@ public class ApiGatewayApplication {
           .uri("lb://auth-service")
       )
       .route(
-        "user-service-with-auth",
-        r -> r.path("/api/v1/users/me/**")
-          .filters(f -> f.filter(authFilter))
+        "user-service-create",
+        r -> r.path("/api/v1/users")
+          .and()
+          .method(HttpMethod.POST)
           .uri("lb://user-service")
       )
       .route(
-        "user-service-no-auth",
-        r -> r.path("/api/v1/users/**")
+        "user-service-get-all-public",
+        r -> r.path("/api/v1/users")
+          .and()
+          .method(HttpMethod.GET)
+          .uri("lb://user-service")
+      )
+      .route(
+        "user-service-cache-refresh-public",
+        r -> r.path("/api/v1/users/cache/refresh")
+          .and()
+          .method(HttpMethod.POST)
+          .uri("lb://user-service")
+      )
+      .route(
+        "user-service-with-auth",
+        r -> r.path("/api/v1/users", "/api/v1/users/**")
+          .filters(f -> f.filter(authFilter))
           .uri("lb://user-service")
       )
       .route(

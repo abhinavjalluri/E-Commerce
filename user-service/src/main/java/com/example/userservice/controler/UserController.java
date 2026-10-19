@@ -78,7 +78,6 @@ public class UserController {
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @GetMapping
-  @RequiresAuthentication
   public ResponseEntity<PageResponse<UserDto>> getAllUsers(
     HttpServletRequest request,
     @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
@@ -147,7 +146,6 @@ public class UserController {
     security = @SecurityRequirement(name = "bearerAuth")
   )
   @PostMapping("/cache/refresh")
-  @RequiresAuthentication
   public ResponseEntity<Map<String, Integer>> refreshCache(HttpServletRequest request) {
     logRequest(request, null);
     return ResponseEntity.ok(Map.of("cachedUsers", userService.refreshCache()));

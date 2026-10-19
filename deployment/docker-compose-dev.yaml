@@ -130,10 +130,16 @@ services:
     image: inventory-service
     environment:
       SPRING_PROFILES_ACTIVE: 'docker'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     restart: unless-stopped
     depends_on:
-      - eureka-service
-      - db-inventory
+      eureka-service:
+        condition: service_started
+      db-inventory:
+        condition: service_started
+      redis:
+        condition: service_healthy
     networks:
       - e-commerce-store-dev
 

@@ -16,8 +16,7 @@ import static com.example.userservice.config.context.ContextHolder.CORRELATION_I
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class PerRequestFilter
-  extends OncePerRequestFilter {
+public class PerRequestFilter extends OncePerRequestFilter {
 
   private final ContextHolder contextHolder;
 
