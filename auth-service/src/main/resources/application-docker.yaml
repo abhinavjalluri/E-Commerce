@@ -21,6 +21,11 @@ spring:
   mvc:
     problemdetails:
       enabled: false
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
 management:
   otlp:
     metrics:
