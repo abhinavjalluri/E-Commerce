@@ -149,6 +149,62 @@ public class ReviewController {
     return ResponseEntity.ok(reviews);
   }
 
+  /**
+   * Get all reviews
+   */
+  @Operation(
+    summary = "Get all reviews",
+    responses = {
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ReviewDto.class)))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    }
+  )
+  @GetMapping
+  public ResponseEntity<List<ReviewDto>> getAll(HttpServletRequest request) {
+    logRequest(request, null);
+    var reviews = reviewService.getAll();
+    return ResponseEntity.ok(reviews);
+  }
+
+  /**
+   * Get the review by id for the current user
+   */
+  @Operation(
+    summary = "Get the review by id for the current user",
+    responses = {
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ReviewDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @GetMapping("users/me/{reviewId}")
+  @RequiresAuthentication
+  public ResponseEntity<ReviewDto> getOne(HttpServletRequest request, @PathVariable Long reviewId) {
+    logRequest(request, null);
+    var review = reviewService.getOne(reviewId);
+    return ResponseEntity.ok(review);
+  }
+
+  /**
+   * Update a review for the current user
+   */
+  @Operation(
+    summary = "Update a review for the current user",
+    responses = {
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ReviewDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @PutMapping("users/me/{reviewId}")
+  @RequiresAuthentication
+  public ResponseEntity<ReviewDto> update(HttpServletRequest request, @PathVariable Long reviewId,
+                                           @Valid @RequestBody ReviewCreateDto reviewCreateDto) {
+    logRequest(request, reviewCreateDto);
+    var review = reviewService.updateOne(reviewId, reviewCreateDto);
+    return ResponseEntity.ok(review);
+  }
+
   private void logRequest(HttpServletRequest request, Object obj) {
     log.info("{} - {} - {} - {} - {}", request.getMethod(), request.getRequestURI(), contextHolder.getCorrelationId(), contextHolder.getUsername(), obj);
   }

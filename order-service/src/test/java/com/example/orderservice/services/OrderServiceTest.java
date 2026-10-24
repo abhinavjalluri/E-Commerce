@@ -198,4 +198,55 @@ class OrderServiceTest {
       OrderException.ORDER_DOES_NOT_EXIST
     );
   }
+  @Test
+  void getAll_ShouldReturnCurrentUsersOrders() {
+    var order = Order.builder().id(1L).userId(1L).build();
+    var dto = OrderDto.builder().id(1L).build();
+    when(orderRepository.findAllByUserId(1L)).thenReturn(List.of(order));
+    when(orderMapper.toDto(order)).thenReturn(dto);
+
+    Assertions.assertEquals(List.of(dto), orderService.getAll());
+  }
+
+  @Test
+  void updateOne_ShouldReplaceOrderProducts() {
+    var order = Order.builder().id(1L).userId(1L).build();
+    var dto = new OrderCreateDto(List.of(new OrderProductCreateDto(1L, 2)));
+    var expected = OrderDto.builder().id(1L).build();
+    when(orderRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(order));
+    when(productServiceClient.getProductById(List.of(1L))).thenReturn(Map.of(1L, productDto));
+    when(orderRepository.save(order)).thenReturn(order);
+    when(orderMapper.toDto(order)).thenReturn(expected);
+
+    Assertions.assertEquals(expected, orderService.updateOne(1L, dto));
+    Assertions.assertEquals(2, order.getProducts().get(0).getQuantity());
+    Assertions.assertSame(order, order.getProducts().get(0).getOrder());
+    verify(orderRepository).deleteProductsByOrderId(1L);
+    verifyNoInteractions(orderEventProducer);
+  }
+
+  @Test
+  void deleteOne_ShouldDeleteProductsAndOrder() {
+    var order = Order.builder().id(1L).userId(1L).build();
+    when(orderRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(order));
+
+    orderService.deleteOne(1L);
+
+    var inOrder = inOrder(orderRepository);
+    inOrder.verify(orderRepository).deleteProductsByOrderId(1L);
+    inOrder.verify(orderRepository).delete(order);
+    verifyNoInteractions(productServiceClient, orderEventProducer);
+  }
+
+  @Test
+  void mutations_WhenOrderMissing_ShouldUseExistingOrderException() {
+    when(orderRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
+
+    var exception = Assertions.assertThrows(OrderException.class, () -> orderService.deleteOne(1L));
+    Assertions.assertEquals(OrderException.ORDER_DOES_NOT_EXIST, exception.getMessage());
+    Assertions.assertThrows(OrderException.class, () -> orderService.updateOne(1L,
+      new OrderCreateDto(List.of(new OrderProductCreateDto(1L, 2)))));
+    verify(orderRepository, never()).deleteProductsByOrderId(anyLong());
+    verifyNoInteractions(productServiceClient);
+  }
 }

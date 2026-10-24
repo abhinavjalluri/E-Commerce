@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -256,5 +255,57 @@ class ReviewServiceTest {
 
     //Assert
     Assertions.assertEquals(expectedTopRatedProducts, actualTopRatedProducts);
+  }
+  @Test
+  void getAll_ShouldReturnAllReviews() {
+    when(reviewRepository.findAll()).thenReturn(List.of(review));
+    when(reviewMapper.toDto(List.of(review))).thenReturn(List.of(reviewDto));
+
+    Assertions.assertEquals(List.of(reviewDto), reviewService.getAll());
+  }
+
+  @Test
+  void getOne_ShouldReturnCurrentUsersReview() {
+    when(reviewRepository.findByUserIdAndId(1L, 1L)).thenReturn(Optional.of(review));
+    when(reviewMapper.toDto(review)).thenReturn(reviewDto);
+
+    Assertions.assertEquals(reviewDto, reviewService.getOne(1L));
+  }
+
+  @Test
+  void updateOne_ShouldUpdateExistingReview() {
+    when(reviewRepository.findByUserIdAndId(1L, 1L)).thenReturn(Optional.of(review));
+    when(reviewRepository.findByUserIdAndOrderIdAndProductId(1L, 1L, 1L))
+      .thenReturn(Optional.of(review));
+    when(orderServiceClient.getOrder(1L)).thenReturn(Optional.of(OrderDto.builder()
+      .products(List.of(orderProduct)).build()));
+    when(reviewRepository.save(review)).thenReturn(review);
+    when(reviewMapper.toDto(review)).thenReturn(reviewDto);
+
+    Assertions.assertEquals(reviewDto, reviewService.updateOne(1L, reviewCreateDto));
+    verify(reviewMapper).partialUpdate(reviewCreateDto, review);
+  }
+
+  @Test
+  void updateOne_WhenDuplicateReview_ShouldThrowExistingException() {
+    when(reviewRepository.findByUserIdAndId(1L, 1L)).thenReturn(Optional.of(review));
+    when(reviewRepository.findByUserIdAndOrderIdAndProductId(1L, 1L, 1L))
+      .thenReturn(Optional.of(Review.builder().id(2L).build()));
+
+    var exception = Assertions.assertThrows(ReviewException.class,
+      () -> reviewService.updateOne(1L, reviewCreateDto));
+
+    Assertions.assertEquals(ReviewException.REVIEW_ALREADY_EXISTS, exception.getMessage());
+    verify(reviewRepository, never()).save(any(Review.class));
+  }
+
+  @Test
+  void getAndUpdate_WhenReviewMissing_ShouldThrowReviewException() {
+    when(reviewRepository.findByUserIdAndId(1L, 1L)).thenReturn(Optional.empty());
+
+    var exception = Assertions.assertThrows(ReviewException.class, () -> reviewService.getOne(1L));
+    Assertions.assertEquals(ReviewException.REVIEW_DOES_NOT_EXIST, exception.getMessage());
+    Assertions.assertThrows(ReviewException.class, () -> reviewService.updateOne(1L, reviewCreateDto));
+    verify(reviewRepository, never()).save(any(Review.class));
   }
 }

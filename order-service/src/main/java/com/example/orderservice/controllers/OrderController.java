@@ -6,6 +6,7 @@ import com.example.orderservice.dtos.OrderCreateDto;
 import com.example.orderservice.dtos.OrderDto;
 import com.example.orderservice.services.IOrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -74,6 +77,64 @@ public class OrderController {
     logRequest(request);
     var orderDto = orderService.getOne(orderId);
     return ResponseEntity.ok(orderDto);
+  }
+
+  /**
+   * Get all orders for the current user
+   */
+  @Operation(
+    summary = "Get all orders for the current user",
+    responses = {
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = OrderDto.class)))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @GetMapping("users/me")
+  @RequiresAuthentication
+  public ResponseEntity<List<OrderDto>> getAll(HttpServletRequest request) {
+    logRequest(request);
+    var orders = orderService.getAll();
+    return ResponseEntity.ok(orders);
+  }
+
+  /**
+   * Update an order for the current user
+   */
+  @Operation(
+    summary = "Update an order for the current user",
+    responses = {
+      @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @PutMapping("users/me/{orderId}")
+  @RequiresAuthentication
+  public ResponseEntity<OrderDto> update(HttpServletRequest request, @PathVariable Long orderId,
+                                        @Valid @RequestBody OrderCreateDto orderCreateDto) {
+    logRequest(request, orderCreateDto);
+    var order = orderService.updateOne(orderId, orderCreateDto);
+    return ResponseEntity.ok(order);
+  }
+
+  /**
+   * Delete an order for the current user
+   */
+  @Operation(
+    summary = "Delete an order for the current user",
+    responses = {
+      @ApiResponse(responseCode = "204"),
+      @ApiResponse(responseCode = "400", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+    },
+    security = @SecurityRequirement(name = "bearerAuth")
+  )
+  @DeleteMapping("users/me/{orderId}")
+  @RequiresAuthentication
+  public ResponseEntity<Void> delete(HttpServletRequest request, @PathVariable Long orderId) {
+    logRequest(request);
+    orderService.deleteOne(orderId);
+    return ResponseEntity.noContent().build();
   }
 
   private void logRequest(HttpServletRequest request, Object obj) {

@@ -16,6 +16,12 @@ public interface IReviewService {
 
   List<ReviewDto> getAllByUser();
 
+  ReviewDto getOne(Long reviewId);
+
+  ReviewDto updateOne(Long reviewId, ReviewCreateDto reviewCreateDto);
+
+  List<ReviewDto> getAll();
+
   boolean deleteOne(Long reviewId);
 
   List<ProductAvgRatDto> getTopAvgRatedProducts(int max);

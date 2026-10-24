@@ -7,6 +7,7 @@ import com.example.reviewsservice.mapper.IReviewMapper;
 import com.example.reviewsservice.models.Review;
 import com.example.reviewsservice.outbound.http.IOrderServiceClient;
 import com.example.reviewsservice.repository.IReviewRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,39 @@ public class ReviewService implements IReviewService {
   public List<ReviewDto> getAllByProduct(Long productId) {
     var reviewsByProduct = reviewRepository.findByProductId(productId);
     return reviewMapper.toDto(reviewsByProduct);
+  }
+
+  @Override
+  public List<ReviewDto> getAll() {
+    var reviews = reviewRepository.findAll();
+    return reviewMapper.toDto(reviews);
+  }
+
+  @Override
+  public ReviewDto getOne(Long reviewId) {
+    var review = reviewRepository.findByUserIdAndId(context.getUserId(), reviewId)
+      .orElseThrow(() -> new ReviewException(ReviewException.REVIEW_DOES_NOT_EXIST));
+    return reviewMapper.toDto(review);
+  }
+
+  @Transactional
+  @Override
+  public ReviewDto updateOne(Long reviewId, ReviewCreateDto reviewCreateDto) {
+    var review = reviewRepository.findByUserIdAndId(context.getUserId(), reviewId)
+      .orElseThrow(() -> new ReviewException(ReviewException.REVIEW_DOES_NOT_EXIST));
+    var existingReview = reviewRepository.findByUserIdAndOrderIdAndProductId(
+      context.getUserId(), reviewCreateDto.orderId(), reviewCreateDto.productId());
+    if (existingReview.isPresent() && !existingReview.get().getId().equals(reviewId)) {
+      throw new ReviewException(ReviewException.REVIEW_ALREADY_EXISTS);
+    }
+    var order = orderServiceClient.getOrder(reviewCreateDto.orderId())
+      .orElseThrow(() -> new ReviewException(ReviewException.ORDER_DOES_NOT_EXIST));
+    if (!isProductPresentInOrder(reviewCreateDto.productId(), order)) {
+      throw new ReviewException(ReviewException.PRODUCT_NOT_PRESENT_IN_ORDER);
+    }
+    reviewMapper.partialUpdate(reviewCreateDto, review);
+    var reviewSaved = reviewRepository.save(review);
+    return reviewMapper.toDto(reviewSaved);
   }
 
   @Override

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +71,37 @@ public class OrderService implements IOrderService {
     var order = orderRepository.findById(orderId)
       .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
     return orderMapper.toDto(order);
+  }
+
+  @Transactional
+  @Override
+  public List<OrderDto> getAll() {
+    var orders = orderRepository.findAllByUserId(contextHolder.getUserId());
+    return orders.stream()
+      .map(orderMapper::toDto)
+      .toList();
+  }
+
+  @Transactional
+  @Override
+  public OrderDto updateOne(Long orderId, OrderCreateDto orderCreateDto) {
+    var order = orderRepository.findByIdAndUserId(orderId, contextHolder.getUserId())
+      .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
+    var products = getOrderProducts(orderCreateDto, order);
+    orderRepository.deleteProductsByOrderId(orderId);
+    order.setProducts(new ArrayList<>(products));
+    var orderSaved = orderRepository.save(order);
+    return orderMapper.toDto(orderSaved);
+  }
+
+  @Transactional
+  @Override
+  public void deleteOne(Long orderId) {
+    var order = orderRepository.findByIdAndUserId(orderId, contextHolder.getUserId())
+      .orElseThrow(() -> new OrderException(OrderException.ORDER_DOES_NOT_EXIST));
+    orderRepository.deleteProductsByOrderId(orderId);
+    order.setProducts(new ArrayList<>());
+    orderRepository.delete(order);
   }
 
   private List<OrderProduct> getOrderProducts(OrderCreateDto orderCreateDto, Order order) {
